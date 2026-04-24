@@ -1,0 +1,7 @@
+/home/runner/work/library-base/library-base/starters/starter-openapi/src/main/java/com/github/juanfranciscofernandezherreros/library/openapi/generator/DtoGenerator.java
+/home/runner/work/library-base/library-base/starters/starter-openapi/src/main/java/com/github/juanfranciscofernandezherreros/library/openapi/generator/OperationEntry.java
+/home/runner/work/library-base/library-base/starters/starter-openapi/src/main/java/com/github/juanfranciscofernandezherreros/library/openapi/autoconfigure/OpenApiAutoConfiguration.java
+/home/runner/work/library-base/library-base/starters/starter-openapi/src/main/java/com/github/juanfranciscofernandezherreros/library/openapi/generator/JavaTypeResolver.java
+/home/runner/work/library-base/library-base/starters/starter-openapi/src/main/java/com/github/juanfranciscofernandezherreros/library/openapi/generator/OpenApiGeneratorService.java
+/home/runner/work/library-base/library-base/starters/starter-openapi/src/main/java/com/github/juanfranciscofernandezherreros/library/openapi/autoconfigure/OpenApiProperties.java
+/home/runner/work/library-base/library-base/starters/starter-openapi/src/main/java/com/github/juanfranciscofernandezherreros/library/openapi/generator/ControllerGenerator.java
