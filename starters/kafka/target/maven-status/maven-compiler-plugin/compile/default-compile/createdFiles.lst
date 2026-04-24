@@ -1,4 +1,6 @@
 com/github/juanfranciscofernandezherreros/library/kafka/autoconfigure/KafkaAutoConfiguration.class
-META-INF/spring-configuration-metadata.json
+com/github/juanfranciscofernandezherreros/library/kafka/autoconfigure/KafkaLibraryProperties$Streams.class
+com/github/juanfranciscofernandezherreros/library/kafka/streams/LibraryKafkaStreamsConfig.class
+com/github/juanfranciscofernandezherreros/library/kafka/consumer/LibraryKafkaConsumer.class
 com/github/juanfranciscofernandezherreros/library/kafka/autoconfigure/KafkaLibraryProperties.class
 com/github/juanfranciscofernandezherreros/library/kafka/producer/LibraryKafkaProducer.class

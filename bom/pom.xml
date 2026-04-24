@@ -71,6 +71,11 @@
             </dependency>
             <dependency>
                 <groupId>com.github.juanfranciscofernandezherreros</groupId>
+                <artifactId>library-base-starter-db</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.juanfranciscofernandezherreros</groupId>
                 <artifactId>library-base-starter-test</artifactId>
                 <version>${project.version}</version>
             </dependency>

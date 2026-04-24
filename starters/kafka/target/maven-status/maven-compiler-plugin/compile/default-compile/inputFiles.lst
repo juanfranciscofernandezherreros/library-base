@@ -1,3 +1,5 @@
 /home/runner/work/library-base/library-base/starters/kafka/src/main/java/com/github/juanfranciscofernandezherreros/library/kafka/producer/LibraryKafkaProducer.java
+/home/runner/work/library-base/library-base/starters/kafka/src/main/java/com/github/juanfranciscofernandezherreros/library/kafka/streams/LibraryKafkaStreamsConfig.java
+/home/runner/work/library-base/library-base/starters/kafka/src/main/java/com/github/juanfranciscofernandezherreros/library/kafka/consumer/LibraryKafkaConsumer.java
 /home/runner/work/library-base/library-base/starters/kafka/src/main/java/com/github/juanfranciscofernandezherreros/library/kafka/autoconfigure/KafkaAutoConfiguration.java
 /home/runner/work/library-base/library-base/starters/kafka/src/main/java/com/github/juanfranciscofernandezherreros/library/kafka/autoconfigure/KafkaLibraryProperties.java
