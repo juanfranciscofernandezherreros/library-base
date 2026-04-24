@@ -53,6 +53,20 @@
         <openapi.model-package>${project.groupId}.api.model</openapi.model-package>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <!-- Import library-base-bom so consumers inheriting this parent
+                 do not need to import it explicitly in their own pom.xml -->
+            <dependency>
+                <groupId>com.github.juanfranciscofernandezherreros</groupId>
+                <artifactId>library-base-bom</artifactId>
+                <version>${library-base.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <build>
         <pluginManagement>
             <plugins>
