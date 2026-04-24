@@ -1,0 +1,108 @@
+@options
+@packages
+-classpath
+'/home/runner/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.2.5/spring-boot-autoconfigure-3.2.5.jar:/home/runner/.m2/repository/org/springframework/boot/spring-boot/3.2.5/spring-boot-3.2.5.jar:/home/runner/.m2/repository/org/springframework/spring-context/6.1.6/spring-context-6.1.6.jar:/home/runner/.m2/repository/org/springframework/spring-aop/6.1.6/spring-aop-6.1.6.jar:/home/runner/.m2/repository/org/springframework/spring-expression/6.1.6/spring-expression-6.1.6.jar:/home/runner/.m2/repository/org/springframework/boot/spring-boot-configuration-processor/3.2.5/spring-boot-configuration-processor-3.2.5.jar:/home/runner/.m2/repository/io/swagger/parser/v3/swagger-parser/2.1.22/swagger-parser-2.1.22.jar:/home/runner/.m2/repository/io/swagger/parser/v3/swagger-parser-v2-converter/2.1.22/swagger-parser-v2-converter-2.1.22.jar:/home/runner/.m2/repository/io/swagger/swagger-core/1.6.14/swagger-core-1.6.14.jar:/home/runner/.m2/repository/org/apache/commons/commons-lang3/3.13.0/commons-lang3-3.13.0.jar:/home/runner/.m2/repository/io/swagger/swagger-models/1.6.14/swagger-models-1.6.14.jar:/home/runner/.m2/repository/io/swagger/swagger-annotations/1.6.14/swagger-annotations-1.6.14.jar:/home/runner/.m2/repository/com/google/guava/guava/32.1.3-android/guava-32.1.3-android.jar:/home/runner/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar:/home/runner/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar:/home/runner/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar:/home/runner/.m2/repository/org/checkerframework/checker-qual/3.37.0/checker-qual-3.37.0.jar:/home/runner/.m2/repository/com/google/errorprone/error_prone_annotations/2.21.1/error_prone_annotations-2.21.1.jar:/home/runner/.m2/repository/com/google/j2objc/j2objc-annotations/2.8/j2objc-annotations-2.8.jar:/home/runner/.m2/repository/io/swagger/swagger-parser/1.0.70/swagger-parser-1.0.70.jar:/home/runner/.m2/repository/io/swagger/swagger-parser-safe-url-resolver/1.0.70/swagger-parser-safe-url-resolver-1.0.70.jar:/home/runner/.m2/repository/io/swagger/swagger-compat-spec-parser/1.0.70/swagger-compat-spec-parser-1.0.70.jar:/home/runner/.m2/repository/com/github/java-json-tools/json-schema-validator/2.2.14/json-schema-validator-2.2.14.jar:/home/runner/.m2/repository/com/github/java-json-tools/jackson-coreutils-equivalence/1.0/jackson-coreutils-equivalence-1.0.jar:/home/runner/.m2/repository/com/github/java-json-tools/json-schema-core/1.2.14/json-schema-core-1.2.14.jar:/home/runner/.m2/repository/com/github/java-json-tools/uri-template/0.10/uri-template-0.10.jar:/home/runner/.m2/repository/org/mozilla/rhino/1.7.7.2/rhino-1.7.7.2.jar:/home/runner/.m2/repository/joda-time/joda-time/2.10.5/joda-time-2.10.5.jar:/home/runner/.m2/repository/com/googlecode/libphonenumber/libphonenumber/8.11.1/libphonenumber-8.11.1.jar:/home/runner/.m2/repository/net/sf/jopt-simple/jopt-simple/5.0.4/jopt-simple-5.0.4.jar:/home/runner/.m2/repository/com/github/java-json-tools/json-patch/1.13/json-patch-1.13.jar:/home/runner/.m2/repository/com/github/java-json-tools/msg-simple/1.2/msg-simple-1.2.jar:/home/runner/.m2/repository/com/github/java-json-tools/btf/1.3/btf-1.3.jar:/home/runner/.m2/repository/com/github/java-json-tools/jackson-coreutils/2.0/jackson-coreutils-2.0.jar:/home/runner/.m2/repository/org/apache/httpcomponents/httpclient/4.5.14/httpclient-4.5.14.jar:/home/runner/.m2/repository/org/apache/httpcomponents/httpcore/4.4.16/httpcore-4.4.16.jar:/home/runner/.m2/repository/commons-logging/commons-logging/1.2/commons-logging-1.2.jar:/home/runner/.m2/repository/commons-codec/commons-codec/1.16.1/commons-codec-1.16.1.jar:/home/runner/.m2/repository/io/swagger/core/v3/swagger-models/2.2.21/swagger-models-2.2.21.jar:/home/runner/.m2/repository/io/swagger/parser/v3/swagger-parser-core/2.1.22/swagger-parser-core-2.1.22.jar:/home/runner/.m2/repository/io/swagger/parser/v3/swagger-parser-v3/2.1.22/swagger-parser-v3-2.1.22.jar:/home/runner/.m2/repository/io/swagger/core/v3/swagger-core/2.2.21/swagger-core-2.2.21.jar:/home/runner/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.15.4/jackson-datatype-jsr310-2.15.4.jar:/home/runner/.m2/repository/io/swagger/core/v3/swagger-annotations/2.2.21/swagger-annotations-2.2.21.jar:/home/runner/.m2/repository/jakarta/validation/jakarta.validation-api/3.0.2/jakarta.validation-api-3.0.2.jar:/home/runner/.m2/repository/io/swagger/parser/v3/swagger-parser-safe-url-resolver/2.1.22/swagger-parser-safe-url-resolver-2.1.22.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.4/jackson-annotations-2.15.4.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.4/jackson-databind-2.15.4.jar:/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.4/jackson-core-2.15.4.jar:/home/runner/.m2/repository/com/fasterxml/jackson/dataformat/jackson-dataformat-yaml/2.15.4/jackson-dataformat-yaml-2.15.4.jar:/home/runner/.m2/repository/org/yaml/snakeyaml/2.2/snakeyaml-2.2.jar:/home/runner/.m2/repository/commons-io/commons-io/2.15.1/commons-io-2.15.1.jar:/home/runner/.m2/repository/org/springframework/spring-web/6.1.6/spring-web-6.1.6.jar:/home/runner/.m2/repository/org/springframework/spring-beans/6.1.6/spring-beans-6.1.6.jar:/home/runner/.m2/repository/org/springframework/spring-core/6.1.6/spring-core-6.1.6.jar:/home/runner/.m2/repository/org/springframework/spring-jcl/6.1.6/spring-jcl-6.1.6.jar:/home/runner/.m2/repository/io/micrometer/micrometer-observation/1.12.5/micrometer-observation-1.12.5.jar:/home/runner/.m2/repository/io/micrometer/micrometer-commons/1.12.5/micrometer-commons-1.12.5.jar:/home/runner/.m2/repository/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13.jar:/home/runner/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.2/jakarta.xml.bind-api-4.0.2.jar:/home/runner/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.3/jakarta.activation-api-2.1.3.jar'
+-encoding
+'UTF-8'
+-protected
+--release
+17
+-sourcepath
+'/home/runner/work/library-base/library-base/starters/starter-openapi/src/main/java:/home/runner/work/library-base/library-base/starters/starter-openapi/target/generated-sources/annotations'
+-author
+-bottom
+'Copyright &#169; 2026. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'library-base-starter-openapi 1.0.1 API'
+-use
+-version
+-windowtitle
+'library-base-starter-openapi 1.0.1 API'
+com.github.juanfranciscofernandezherreros.library.openapi.generator
+com.github.juanfranciscofernandezherreros.library.openapi.autoconfigure
+/home/runner/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.2.5/spring-boot-autoconfigure-3.2.5.jar = 1713463052000
+/home/runner/.m2/repository/org/springframework/boot/spring-boot/3.2.5/spring-boot-3.2.5.jar = 1713463081000
+/home/runner/.m2/repository/org/springframework/spring-context/6.1.6/spring-context-6.1.6.jar = 1712825154000
+/home/runner/.m2/repository/org/springframework/spring-aop/6.1.6/spring-aop-6.1.6.jar = 1712825153000
+/home/runner/.m2/repository/org/springframework/spring-expression/6.1.6/spring-expression-6.1.6.jar = 1712825154000
+/home/runner/.m2/repository/org/springframework/boot/spring-boot-configuration-processor/3.2.5/spring-boot-configuration-processor-3.2.5.jar = 1713463010000
+/home/runner/.m2/repository/io/swagger/parser/v3/swagger-parser/2.1.22/swagger-parser-2.1.22.jar = 1712306023000
+/home/runner/.m2/repository/io/swagger/parser/v3/swagger-parser-v2-converter/2.1.22/swagger-parser-v2-converter-2.1.22.jar = 1712306020000
+/home/runner/.m2/repository/io/swagger/swagger-core/1.6.14/swagger-core-1.6.14.jar = 1710850244000
+/home/runner/.m2/repository/org/apache/commons/commons-lang3/3.13.0/commons-lang3-3.13.0.jar = 1690141497000
+/home/runner/.m2/repository/io/swagger/swagger-models/1.6.14/swagger-models-1.6.14.jar = 1710850229000
+/home/runner/.m2/repository/io/swagger/swagger-annotations/1.6.14/swagger-annotations-1.6.14.jar = 1710850205000
+/home/runner/.m2/repository/com/google/guava/guava/32.1.3-android/guava-32.1.3-android.jar = 1696970389000
+/home/runner/.m2/repository/com/google/guava/failureaccess/1.0.1/failureaccess-1.0.1.jar = 1542650246000
+/home/runner/.m2/repository/com/google/guava/listenablefuture/9999.0-empty-to-avoid-conflict-with-guava/listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar = 1536694843000
+/home/runner/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar = 1490936147000
+/home/runner/.m2/repository/org/checkerframework/checker-qual/3.37.0/checker-qual-3.37.0.jar = 1690910757000
+/home/runner/.m2/repository/com/google/errorprone/error_prone_annotations/2.21.1/error_prone_annotations-2.21.1.jar = 1691185028000
+/home/runner/.m2/repository/com/google/j2objc/j2objc-annotations/2.8/j2objc-annotations-2.8.jar = 1673409222000
+/home/runner/.m2/repository/io/swagger/swagger-parser/1.0.70/swagger-parser-1.0.70.jar = 1711525979000
+/home/runner/.m2/repository/io/swagger/swagger-parser-safe-url-resolver/1.0.70/swagger-parser-safe-url-resolver-1.0.70.jar = 1711525978000
+/home/runner/.m2/repository/io/swagger/swagger-compat-spec-parser/1.0.70/swagger-compat-spec-parser-1.0.70.jar = 1711525976000
+/home/runner/.m2/repository/com/github/java-json-tools/json-schema-validator/2.2.14/json-schema-validator-2.2.14.jar = 1590597080000
+/home/runner/.m2/repository/com/github/java-json-tools/jackson-coreutils-equivalence/1.0/jackson-coreutils-equivalence-1.0.jar = 1590593580000
+/home/runner/.m2/repository/com/github/java-json-tools/json-schema-core/1.2.14/json-schema-core-1.2.14.jar = 1590595180000
+/home/runner/.m2/repository/com/github/java-json-tools/uri-template/0.10/uri-template-0.10.jar = 1578313873000
+/home/runner/.m2/repository/org/mozilla/rhino/1.7.7.2/rhino-1.7.7.2.jar = 1503612585000
+/home/runner/.m2/repository/joda-time/joda-time/2.10.5/joda-time-2.10.5.jar = 1571926272000
+/home/runner/.m2/repository/com/googlecode/libphonenumber/libphonenumber/8.11.1/libphonenumber-8.11.1.jar = 1575993340000
+/home/runner/.m2/repository/net/sf/jopt-simple/jopt-simple/5.0.4/jopt-simple-5.0.4.jar = 1499958759000
+/home/runner/.m2/repository/com/github/java-json-tools/json-patch/1.13/json-patch-1.13.jar = 1590598434000
+/home/runner/.m2/repository/com/github/java-json-tools/msg-simple/1.2/msg-simple-1.2.jar = 1578309539000
+/home/runner/.m2/repository/com/github/java-json-tools/btf/1.3/btf-1.3.jar = 1578144094000
+/home/runner/.m2/repository/com/github/java-json-tools/jackson-coreutils/2.0/jackson-coreutils-2.0.jar = 1590590716000
+/home/runner/.m2/repository/org/apache/httpcomponents/httpclient/4.5.14/httpclient-4.5.14.jar = 1669833653000
+/home/runner/.m2/repository/org/apache/httpcomponents/httpcore/4.4.16/httpcore-4.4.16.jar = 1669455900000
+/home/runner/.m2/repository/commons-logging/commons-logging/1.2/commons-logging-1.2.jar = 1404583945000
+/home/runner/.m2/repository/commons-codec/commons-codec/1.16.1/commons-codec-1.16.1.jar = 1707060667000
+/home/runner/.m2/repository/io/swagger/core/v3/swagger-models/2.2.21/swagger-models-2.2.21.jar = 1710921121000
+/home/runner/.m2/repository/io/swagger/parser/v3/swagger-parser-core/2.1.22/swagger-parser-core-2.1.22.jar = 1712306020000
+/home/runner/.m2/repository/io/swagger/parser/v3/swagger-parser-v3/2.1.22/swagger-parser-v3-2.1.22.jar = 1712306022000
+/home/runner/.m2/repository/io/swagger/core/v3/swagger-core/2.2.21/swagger-core-2.2.21.jar = 1710921117000
+/home/runner/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.15.4/jackson-datatype-jsr310-2.15.4.jar = 1708020617000
+/home/runner/.m2/repository/io/swagger/core/v3/swagger-annotations/2.2.21/swagger-annotations-2.2.21.jar = 1710921117000
+/home/runner/.m2/repository/jakarta/validation/jakarta.validation-api/3.0.2/jakarta.validation-api-3.0.2.jar = 1653588099000
+/home/runner/.m2/repository/io/swagger/parser/v3/swagger-parser-safe-url-resolver/2.1.22/swagger-parser-safe-url-resolver-2.1.22.jar = 1712306023000
+/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.4/jackson-annotations-2.15.4.jar = 1708016371000
+/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.4/jackson-databind-2.15.4.jar = 1708018528000
+/home/runner/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.4/jackson-core-2.15.4.jar = 1708016988000
+/home/runner/.m2/repository/com/fasterxml/jackson/dataformat/jackson-dataformat-yaml/2.15.4/jackson-dataformat-yaml-2.15.4.jar = 1708020165000
+/home/runner/.m2/repository/org/yaml/snakeyaml/2.2/snakeyaml-2.2.jar = 1693124795000
+/home/runner/.m2/repository/commons-io/commons-io/2.15.1/commons-io-2.15.1.jar = 1700843303000
+/home/runner/.m2/repository/org/springframework/spring-web/6.1.6/spring-web-6.1.6.jar = 1712825154000
+/home/runner/.m2/repository/org/springframework/spring-beans/6.1.6/spring-beans-6.1.6.jar = 1712825149000
+/home/runner/.m2/repository/org/springframework/spring-core/6.1.6/spring-core-6.1.6.jar = 1712825153000
+/home/runner/.m2/repository/org/springframework/spring-jcl/6.1.6/spring-jcl-6.1.6.jar = 1712825148000
+/home/runner/.m2/repository/io/micrometer/micrometer-observation/1.12.5/micrometer-observation-1.12.5.jar = 1712584839000
+/home/runner/.m2/repository/io/micrometer/micrometer-commons/1.12.5/micrometer-commons-1.12.5.jar = 1712584828000
+/home/runner/.m2/repository/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13.jar = 1712931843000
+/home/runner/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.2/jakarta.xml.bind-api-4.0.2.jar = 1708335734000
+/home/runner/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.3/jakarta.activation-api-2.1.3.jar = 1707984867000
+/home/runner/work/library-base/library-base/starters/starter-openapi/src/main/java = 1777043429432
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/generated-sources/annotations = 1777043690176
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs/script.js = 1777043693071
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs/allpackages-index.html = 1777043693052
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs/element-list = 1777043692994
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs/module-search-index.js = 1777043693053
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs/index.html = 1777043693039
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs/allclasses-index.html = 1777043693051
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs/member-search-index.js = 1777043693053
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs/package-search-index.js = 1777043693053
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs/overview-summary.html = 1777043693067
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs/overview-tree.html = 1777043693037
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs/help-doc.html = 1777043693070
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs/stylesheet.css = 1777043693071
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs/tag-search-index.js = 1777043693054
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs/index-all.html = 1777043693065
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs/jquery-ui.overrides.css = 1777043693073
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs/search.js = 1777043693072
+/home/runner/work/library-base/library-base/starters/starter-openapi/target/apidocs/type-search-index.js = 1777043693053

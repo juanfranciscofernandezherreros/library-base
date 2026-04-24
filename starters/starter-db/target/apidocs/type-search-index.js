@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"com.github.juanfranciscofernandezherreros.library.db.autoconfigure","l":"DbAutoConfiguration"},{"p":"com.github.juanfranciscofernandezherreros.library.db.autoconfigure","l":"DbProperties"}];updateSearchResults();

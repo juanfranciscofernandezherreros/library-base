@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.github.juanfranciscofernandezherreros.library.openapi.autoconfigure"},{"l":"com.github.juanfranciscofernandezherreros.library.openapi.generator"}];updateSearchResults();

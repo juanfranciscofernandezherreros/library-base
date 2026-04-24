@@ -1,30 +1,26 @@
 # library-base
 
-> A collection of opinionated Spring Boot auto-configuration starters for building Java microservices — covering REST/OpenAPI, databases, Kafka, and shared utilities.
+> A collection of opinionated Spring Boot auto-configuration starters for building Java microservices — covering shared utilities, REST/OpenAPI, databases, Kafka, and test helpers.
 
 ---
 
 ## Table of contents
 
 - [Overview](#overview)
-- [Modules](#modules)
+- [Module structure](#module-structure)
 - [Requirements](#requirements)
-- [Quick start](#quick-start)
+- [Building the library](#building-the-library)
+- [Using the library in a microservice](#using-the-library-in-a-microservice)
+  - [Option A — Inherit the parent POM](#option-a--inherit-the-parent-pom)
+  - [Option B — Import the BOM only](#option-b--import-the-bom-only)
 - [Starters reference](#starters-reference)
   - [starter-base](#starter-base)
   - [starter-openapi](#starter-openapi)
   - [starter-db](#starter-db)
   - [starter-kafka](#starter-kafka)
   - [starter-test](#starter-test)
-- [Example: microservice with OpenAPI (petstore)](#example-microservice-with-openapi-petstore)
-  - [1 · Project structure](#1--project-structure)
-  - [2 · pom.xml](#2--pomxml)
-  - [3 · openapi.yaml (pre-defined spec)](#3--openapiyaml-pre-defined-spec)
-  - [4 · application.yml](#4--applicationyml)
-  - [5 · Implement the generated interface](#5--implement-the-generated-interface)
-  - [6 · Run and test](#6--run-and-test)
-- [Building the library](#building-the-library)
-- [Publishing to Nexus](#publishing-to-nexus)
+- [Full example — Pet Store microservice](#full-example--pet-store-microservice)
+- [Publishing to Nexus / Artifactory](#publishing-to-nexus--artifactory)
 
 ---
 
@@ -32,30 +28,31 @@
 
 `library-base` is a multi-module Maven project that provides ready-made Spring Boot starters for the most common cross-cutting concerns in a microservice landscape:
 
-| Concern | Starter |
-|---------|---------|
-| Shared utilities / base beans | `starter-base` |
-| REST API from an OpenAPI spec | `starter-openapi` |
-| Relational database (JPA + Flyway) | `starter-db` |
-| Apache Kafka producer / consumer | `starter-kafka` |
-| Test helpers | `starter-test` |
+| Concern | Starter artifact |
+|---------|-----------------|
+| Shared utilities / base beans | `library-base-starter-base` |
+| REST API from an OpenAPI spec | `library-base-starter-openapi` |
+| Relational database (JPA + Flyway) | `library-base-starter-db` |
+| Apache Kafka producer / consumer | `library-base-starter-kafka` |
+| Test helpers (JUnit 5 + embedded Kafka) | `library-base-starter-test` |
 
-All starters follow the Spring Boot auto-configuration contract: add the JAR to your classpath and set the relevant `application.yml` properties — no `@Import` annotations required.
+All starters follow the Spring Boot auto-configuration contract: add the JAR to the classpath and set the relevant `application.yml` properties — no `@Import` or `@EnableXxx` annotations required.
 
 ---
 
-## Modules
+## Module structure
 
 ```
 library-base/
-├── parent/          ← parent POM (Java 17, Spring Boot 3.2.5, plugin management)
-├── bom/             ← Bill of Materials (centralised dependency versions)
+├── pom.xml                  ← root reactor (library-base-build)
+├── parent/                  ← library-base-parent  (Java 17, Spring Boot 3.2.5, plugin management)
+├── bom/                     ← library-base-bom     (centralised dependency versions)
 └── starters/
-    ├── starter-base/
-    ├── starter-openapi/
-    ├── starter-db/
-    ├── starter-kafka/
-    └── starter-test/
+    ├── starter-base/        ← library-base-starter-base
+    ├── starter-openapi/     ← library-base-starter-openapi
+    ├── starter-db/          ← library-base-starter-db
+    ├── starter-kafka/       ← library-base-starter-kafka
+    └── starter-test/        ← library-base-starter-test
 ```
 
 ---
@@ -70,11 +67,63 @@ library-base/
 
 ---
 
-## Quick start
+## Building the library
 
-### 1. Import the BOM
+Clone the repository and run `mvn clean install` from the root to compile, test, and install all modules into your local Maven repository (`~/.m2`):
 
-Add the BOM to your project so you never need to specify versions for library-base artefacts:
+```bash
+# Full build (compile + test + install)
+mvn clean install
+
+# Skip tests for a faster iteration
+mvn clean install -DskipTests
+
+# Build and install a single starter (and its upstream dependencies)
+mvn clean install -pl starters/starter-openapi -am
+```
+
+After the build the following artifacts are available in your local repository:
+
+| Artifact | Packaging |
+|----------|-----------|
+| `com.github.juanfranciscofernandezherreros:library-base-parent:1.0.1` | pom |
+| `com.github.juanfranciscofernandezherreros:library-base-bom:1.0.1` | pom |
+| `com.github.juanfranciscofernandezherreros:library-base-starter-base:1.0.1` | jar |
+| `com.github.juanfranciscofernandezherreros:library-base-starter-openapi:1.0.1` | jar |
+| `com.github.juanfranciscofernandezherreros:library-base-starter-db:1.0.1` | jar |
+| `com.github.juanfranciscofernandezherreros:library-base-starter-kafka:1.0.1` | jar |
+| `com.github.juanfranciscofernandezherreros:library-base-starter-test:1.0.1` | jar |
+
+---
+
+## Using the library in a microservice
+
+There are two integration patterns. **Option A** is recommended for new microservices because it also provides the plugin management needed for OpenAPI code generation.
+
+### Option A — Inherit the parent POM
+
+```xml
+<parent>
+  <groupId>com.github.juanfranciscofernandezherreros</groupId>
+  <artifactId>library-base-parent</artifactId>
+  <version>1.0.1</version>
+</parent>
+
+<groupId>com.example</groupId>
+<artifactId>my-service</artifactId>
+<version>0.0.1-SNAPSHOT</version>
+```
+
+Inheriting `library-base-parent` automatically:
+- Sets Java 17, UTF-8 encoding, and Spring Boot 3.2.5 plugin versions.
+- Imports `library-base-bom` so you never need to specify versions for library-base starters.
+- Provides plugin management for `openapi-generator-maven-plugin` and `build-helper-maven-plugin` (activate them by declaring them in `<build><plugins>`).
+- Attaches sources and Javadoc JARs on every build.
+- Disables the Spring Boot fat-JAR repackage goal (libraries must not be repackaged; override with `<skip>false</skip>` in your service's plugin configuration).
+
+### Option B — Import the BOM only
+
+If your microservice already has its own parent POM, import the BOM inside `<dependencyManagement>`:
 
 ```xml
 <dependencyManagement>
@@ -82,7 +131,7 @@ Add the BOM to your project so you never need to specify versions for library-ba
     <dependency>
       <groupId>com.github.juanfranciscofernandezherreros</groupId>
       <artifactId>library-base-bom</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <version>1.0.1</version>
       <type>pom</type>
       <scope>import</scope>
     </dependency>
@@ -90,27 +139,7 @@ Add the BOM to your project so you never need to specify versions for library-ba
 </dependencyManagement>
 ```
 
-### 2. Add the starters you need
-
-```xml
-<!-- REST API from an OpenAPI spec -->
-<dependency>
-  <groupId>com.github.juanfranciscofernandezherreros</groupId>
-  <artifactId>library-base-starter-openapi</artifactId>
-</dependency>
-
-<!-- Database (JPA + Flyway) -->
-<dependency>
-  <groupId>com.github.juanfranciscofernandezherreros</groupId>
-  <artifactId>library-base-starter-db</artifactId>
-</dependency>
-
-<!-- Kafka producer / consumer -->
-<dependency>
-  <groupId>com.github.juanfranciscofernandezherreros</groupId>
-  <artifactId>library-base-starter-kafka</artifactId>
-</dependency>
-```
+You will still need to configure the compiler plugin manually if you want Lombok + MapStruct annotation processing or OpenAPI code generation.
 
 ---
 
@@ -118,39 +147,54 @@ Add the BOM to your project so you never need to specify versions for library-ba
 
 ### starter-base
 
-Provides shared Spring beans and a `BaseService` used by other starters.  
+Provides shared Spring beans and a `BaseService` used by the other starters.  
 No mandatory configuration — works out of the box.
 
+**Dependency:**
+```xml
+<dependency>
+  <groupId>com.github.juanfranciscofernandezherreros</groupId>
+  <artifactId>library-base-starter-base</artifactId>
+</dependency>
+```
+
+**`application.yml` (all optional):**
 ```yaml
-# application.yml (optional)
 library:
   base:
-    application-name: library-base   # default: "library-base"
-    verbose-logging: false           # default: false
+    application-name: my-service   # default: "library-base"
+    verbose-logging: false         # default: false
 ```
 
 ---
 
 ### starter-openapi
 
-Reads an **OpenAPI 3 YAML/JSON spec** and generates:
-- **DTOs** → `<basePackage>.dto.*Dto`
-- **Controller stubs** → `<basePackage>.controller.*Controller`
+Reads an **OpenAPI 3 YAML/JSON spec** and at startup generates Java source files:
+- **DTOs** in `<base-package>.dto`
+- **Controller stubs** in `<base-package>.controller`
 
-Files are written to `outputDir` on every application startup (useful for local development) **and** generated at compile time by the `openapi-generator-maven-plugin` declared in the parent POM.
+The `openapi-generator-maven-plugin` declared in `library-base-parent` also generates these interfaces at compile time so they are fully type-safe.
 
-```yaml
-# application.yml
-library:
-  openapi:
-    enabled: true                                       # default: true
-    spec-path: classpath:openapi.yaml                   # file-system path, classpath: or http(s):// URL
-    output-dir: target/generated-sources/openapi        # default
-    base-package: com.example.myservice.api             # default: generated.api
+**Dependency:**
+```xml
+<dependency>
+  <groupId>com.github.juanfranciscofernandezherreros</groupId>
+  <artifactId>library-base-starter-openapi</artifactId>
+</dependency>
 ```
 
-The parent POM also exposes Maven properties you can override per-project:
+**`application.yml`:**
+```yaml
+library:
+  openapi:
+    enabled: true                                    # default: true
+    spec-path: classpath:openapi.yaml                # file-system path, classpath: or http(s):// URL
+    output-dir: target/generated-sources/openapi     # default
+    base-package: com.example.myservice.api          # default: generated.api
+```
 
+**Maven code-generation properties** (override per-project):
 ```xml
 <properties>
   <openapi.spec-path>${project.basedir}/src/main/resources/openapi.yaml</openapi.spec-path>
@@ -159,15 +203,47 @@ The parent POM also exposes Maven properties you can override per-project:
 </properties>
 ```
 
+Activate the generator plugins in your `<build><plugins>`:
+```xml
+<build>
+  <plugins>
+    <!-- Generate interfaces + DTOs from openapi.yaml -->
+    <plugin>
+      <groupId>org.openapitools</groupId>
+      <artifactId>openapi-generator-maven-plugin</artifactId>
+    </plugin>
+    <!-- Register generated sources so javac picks them up -->
+    <plugin>
+      <groupId>org.codehaus.mojo</groupId>
+      <artifactId>build-helper-maven-plugin</artifactId>
+    </plugin>
+  </plugins>
+</build>
+```
+
 ---
 
 ### starter-db
 
-Auto-configures a JPA `DataSource` with a PostgreSQL `JpaVendorAdapter`.  
-Add `spring-boot-starter-data-jpa` to your project to activate.
+Auto-configures a JPA `JpaVendorAdapter` for PostgreSQL.  
+Requires `spring-boot-starter-data-jpa` on the classpath (add it to your service).
 
+**Dependency:**
+```xml
+<dependency>
+  <groupId>com.github.juanfranciscofernandezherreros</groupId>
+  <artifactId>library-base-starter-db</artifactId>
+</dependency>
+
+<!-- Also add JPA (not bundled to keep the starter optional) -->
+<dependency>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+```
+
+**`application.yml`:**
 ```yaml
-# application.yml
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/mydb
@@ -181,7 +257,6 @@ spring:
     enabled: true
     locations: classpath:db/migration
 
-# library-specific overrides
 library:
   db:
     default-schema: public   # default: "public"
@@ -193,12 +268,20 @@ library:
 ### starter-kafka
 
 Auto-configures a `LibraryKafkaProducer` and an optional `LibraryKafkaConsumer`.  
-`KafkaTemplate` (from `spring-kafka`) must be on the classpath.
+Requires `spring-kafka` on the classpath (included transitively by this starter).
 
-The consumer bean is **not** started by default; enable it explicitly to avoid unwanted listeners in producer-only services.
+The consumer is **not** started by default; set `library.kafka.consumer.enabled=true` to activate it and avoid unwanted listeners in producer-only services.
 
+**Dependency:**
+```xml
+<dependency>
+  <groupId>com.github.juanfranciscofernandezherreros</groupId>
+  <artifactId>library-base-starter-kafka</artifactId>
+</dependency>
+```
+
+**`application.yml`:**
 ```yaml
-# application.yml
 spring:
   kafka:
     bootstrap-servers: localhost:9092
@@ -211,37 +294,49 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-# library-specific configuration
 library:
   kafka:
-    default-topic: library-events          # default: "library-events"
-    client-id-prefix: library              # default: "library"
+    default-topic: my-events               # default: "library-events"
+    client-id-prefix: my-service           # default: "library"
     zookeeper-connect: localhost:2181      # default: "localhost:2181"
-    schema-registry-url: http://localhost:8081  # default: "http://localhost:8081"
+    schema-registry-url: http://localhost:8081
     consumer:
-      enabled: false                       # default: false — set to true to activate the consumer
+      enabled: false                       # default: false — set true to activate
     streams:
-      application-id: library-streams-app # default: "library-streams-app"
-      state-dir: /tmp/kafka-streams       # default: "/tmp/kafka-streams"
+      application-id: my-streams-app      # default: "library-streams-app"
+      state-dir: /tmp/kafka-streams        # default: "/tmp/kafka-streams"
 ```
 
-`LibraryKafkaProducer` exposes three `send` overloads:
-
+**Sending messages:**
 ```java
-producer.send(value);                      // → default topic
-producer.send(key, value);                 // → default topic with key
-producer.send(topic, key, value);          // → explicit topic with key
+@Autowired
+LibraryKafkaProducer<String> producer;
+
+producer.send(value);               // → default topic
+producer.send(key, value);          // → default topic with key
+producer.send(topic, key, value);   // → explicit topic with key
 ```
 
-Override `LibraryKafkaConsumer#process(V payload)` in a subclass to add your own message-handling logic.
+**Custom consumer:**  
+Extend `LibraryKafkaConsumer` and override `process(V payload)`:
+```java
+@Component
+public class MyConsumer extends LibraryKafkaConsumer<String> {
+    @Override
+    protected void process(String payload) {
+        // your business logic
+    }
+}
+```
 
 ---
 
 ### starter-test
 
-Provides shared JUnit 5 / Mockito utilities for unit and integration tests.  
-Add it with `<scope>test</scope>` only:
+Provides JUnit 5 / Mockito / Testcontainers utilities for unit and integration tests.  
+Add it with `<scope>test</scope>` only.
 
+**Dependency:**
 ```xml
 <dependency>
   <groupId>com.github.juanfranciscofernandezherreros</groupId>
@@ -251,30 +346,30 @@ Add it with `<scope>test</scope>` only:
 ```
 
 **`BaseIntegrationTest`** — abstract base class that applies `@SpringBootTest` and activates the `test` Spring profile:
-
 ```java
 @ExtendWith(SpringExtension.class)
 class MyServiceIntegrationTest extends BaseIntegrationTest {
-    // ...
+    // Spring context is started automatically
 }
 ```
 
-**`EmbeddedKafkaTestConfig`** — `@TestConfiguration` that starts an in-process KRaft Kafka broker (no external broker required):
-
+**`EmbeddedKafkaTestConfig`** — `@TestConfiguration` that starts an in-process KRaft Kafka broker (no external broker needed):
 ```java
 @Import(EmbeddedKafkaTestConfig.class)
 class MyKafkaTest extends BaseIntegrationTest {
+    @Autowired
+    EmbeddedKafkaBroker broker;
     // ...
 }
 ```
 
 ---
 
-## Example: microservice with OpenAPI (petstore)
+## Full example — Pet Store microservice
 
-The following walkthrough creates a fully-working **Pet Store microservice** that exposes the pre-defined OpenAPI spec bundled in the `starter-openapi` test resources.
+A complete end-to-end example that exposes a REST API generated from an OpenAPI spec.
 
-### 1 · Project structure
+### Project structure
 
 ```
 petstore-service/
@@ -291,9 +386,7 @@ petstore-service/
             └── openapi.yaml
 ```
 
----
-
-### 2 · pom.xml
+### pom.xml
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -303,63 +396,46 @@ petstore-service/
                              https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <!-- ── Inherit from the library parent to get plugin management ── -->
+  <!-- Inherit from library parent to get plugin management -->
   <parent>
     <groupId>com.github.juanfranciscofernandezherreros</groupId>
     <artifactId>library-base-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1</version>
   </parent>
 
   <groupId>com.example</groupId>
   <artifactId>petstore-service</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
 
-  <!-- ── Override generated package names ── -->
   <properties>
     <openapi.spec-path>${project.basedir}/src/main/resources/openapi.yaml</openapi.spec-path>
     <openapi.api-package>com.example.petstore.api</openapi.api-package>
     <openapi.model-package>com.example.petstore.api.model</openapi.model-package>
   </properties>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>com.github.juanfranciscofernandezherreros</groupId>
-        <artifactId>library-base-bom</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-
   <dependencies>
-    <!-- Spring Boot Web -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
-    <!-- OpenAPI starter: parses spec + generates DTOs and controller interfaces -->
     <dependency>
       <groupId>com.github.juanfranciscofernandezherreros</groupId>
       <artifactId>library-base-starter-openapi</artifactId>
     </dependency>
 
-    <!-- jackson-databind-nullable required by the generated models -->
+    <!-- Required by the generated models for nullable support -->
     <dependency>
       <groupId>org.openapitools</groupId>
       <artifactId>jackson-databind-nullable</artifactId>
     </dependency>
 
-    <!-- Springdoc: serves Swagger UI at /swagger-ui.html -->
+    <!-- Swagger UI at /swagger-ui.html -->
     <dependency>
       <groupId>org.springdoc</groupId>
       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
     </dependency>
 
-    <!-- Test -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
@@ -369,24 +445,22 @@ petstore-service/
 
   <build>
     <plugins>
-      <!-- 1. Generate interfaces + models from openapi.yaml at compile time -->
+      <!-- 1. Generate interfaces + models at compile time -->
       <plugin>
         <groupId>org.openapitools</groupId>
         <artifactId>openapi-generator-maven-plugin</artifactId>
       </plugin>
-
-      <!-- 2. Register the generated sources so javac picks them up -->
+      <!-- 2. Register generated sources -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
       </plugin>
-
-      <!-- 3. Package as a runnable fat JAR -->
+      <!-- 3. Package as a runnable fat JAR (override library default) -->
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
-          <skip>false</skip>  <!-- override the library default -->
+          <skip>false</skip>
         </configuration>
       </plugin>
     </plugins>
@@ -394,12 +468,7 @@ petstore-service/
 </project>
 ```
 
----
-
-### 3 · openapi.yaml (pre-defined spec)
-
-Copy this file to `src/main/resources/openapi.yaml`.  
-This is the same spec included in `starter-openapi` as the default example.
+### src/main/resources/openapi.yaml
 
 ```yaml
 openapi: "3.0.3"
@@ -409,8 +478,7 @@ info:
 paths:
   /pets:
     get:
-      tags:
-        - pets
+      tags: [pets]
       summary: List all pets
       operationId: listPets
       parameters:
@@ -429,8 +497,7 @@ paths:
                 items:
                   $ref: "#/components/schemas/Pet"
     post:
-      tags:
-        - pets
+      tags: [pets]
       summary: Create a pet
       operationId: createPet
       requestBody:
@@ -448,8 +515,7 @@ paths:
                 $ref: "#/components/schemas/Pet"
   /pets/{petId}:
     get:
-      tags:
-        - pets
+      tags: [pets]
       summary: Info for a specific pet
       operationId: getPetById
       parameters:
@@ -490,9 +556,7 @@ components:
           type: string
 ```
 
----
-
-### 4 · application.yml
+### src/main/resources/application.yml
 
 ```yaml
 server:
@@ -502,14 +566,12 @@ spring:
   application:
     name: petstore-service
 
-# library-base OpenAPI runtime generator (writes files on startup for dev workflows)
 library:
   openapi:
     enabled: true
     spec-path: classpath:openapi.yaml
     base-package: com.example.petstore.api
 
-# Springdoc — serves the spec at /v3/api-docs and UI at /swagger-ui.html
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -517,16 +579,28 @@ springdoc:
     path: /swagger-ui.html
 ```
 
----
+### Application entry point
 
-### 5 · Implement the generated interface
+```java
+// src/main/java/com/example/petstore/PetstoreApplication.java
+package com.example.petstore;
 
-After `mvn generate-sources` (or the first `mvn compile`), the plugin generates:
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+@SpringBootApplication
+public class PetstoreApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(PetstoreApplication.class, args);
+    }
+}
+```
+
+### Implement the generated controller interface
+
+After `mvn generate-sources` the plugin creates:
 - `com.example.petstore.api.PetsApi` — Spring MVC interface with all annotations
 - `com.example.petstore.api.model.Pet` — DTO
-
-Create your controller by implementing the generated interface:
 
 ```java
 // src/main/java/com/example/petstore/controller/PetsControllerImpl.java
@@ -538,9 +612,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -569,37 +641,21 @@ public class PetsControllerImpl implements PetsApi {
     @Override
     public ResponseEntity<Pet> getPetById(Long petId) {
         Pet pet = store.get(petId);
-        if (pet == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(pet);
+        return pet != null ? ResponseEntity.ok(pet) : ResponseEntity.notFound().build();
     }
 }
 ```
 
-Entry-point class:
-
-```java
-// src/main/java/com/example/petstore/PetstoreApplication.java
-package com.example.petstore;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class PetstoreApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(PetstoreApplication.class, args);
-    }
-}
-```
-
----
-
-### 6 · Run and test
+### Run and test
 
 ```bash
-# Build and run
+# Build the microservice
+mvn clean package
+
+# Start it
+java -jar target/petstore-service-0.0.1-SNAPSHOT.jar
+
+# Or with the Spring Boot plugin
 mvn spring-boot:run
 
 # Create a pet
@@ -614,28 +670,13 @@ curl -s http://localhost:8080/pets | jq .
 curl -s http://localhost:8080/pets/1 | jq .
 ```
 
-Open the interactive Swagger UI at: **http://localhost:8080/swagger-ui.html**
+Interactive Swagger UI: **http://localhost:8080/swagger-ui.html**
 
 ---
 
-## Building the library
+## Publishing to Nexus / Artifactory
 
-```bash
-# Install all modules into local .m2
-mvn clean install
-
-# Skip tests (faster)
-mvn clean install -DskipTests
-
-# Build a single starter
-mvn clean install -pl starters/starter-openapi -am
-```
-
----
-
-## Publishing to Nexus
-
-Configure your Nexus credentials in `~/.m2/settings.xml`:
+Configure credentials in `~/.m2/settings.xml`:
 
 ```xml
 <settings>
@@ -654,7 +695,7 @@ Configure your Nexus credentials in `~/.m2/settings.xml`:
 </settings>
 ```
 
-Then override the Nexus URLs (or set them in the parent POM):
+Then deploy, overriding the Nexus URLs (or set them permanently in the parent POM):
 
 ```bash
 mvn deploy \
