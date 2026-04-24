@@ -19,10 +19,6 @@
     <name>library-base-parent</name>
     <description>Parent POM for library-base modules — defines common properties and plugin management</description>
 
-    <modules>
-        <module>../bom</module>
-    </modules>
-
     <properties>
         <java.version>17</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
