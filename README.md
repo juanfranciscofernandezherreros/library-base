@@ -177,7 +177,12 @@ baseService.isVerboseLogging();     // → true
 
 #### 3.2 `library-base-starter-kafka` — Integración Kafka
 
-Proporciona un productor Kafka genérico (`LibraryKafkaProducer`), un consumidor base (`LibraryKafkaConsumer`) y configuración de Kafka Streams (`LibraryKafkaStreamsConfig`). Se activa únicamente si `KafkaTemplate` está en el classpath (`@ConditionalOnClass(KafkaTemplate.class)`). Incluye soporte para serialización **Apache Avro** (el serializer de Confluent Schema Registry debe añadirse en el proyecto consumidor).
+Proporciona un productor Kafka genérico (`LibraryKafkaProducer`), un consumidor base
+(`LibraryKafkaConsumer`) y configuración de Kafka Streams (`LibraryKafkaStreamsConfig`).
+Se activa únicamente si `KafkaTemplate` está en el classpath
+(`@ConditionalOnClass(KafkaTemplate.class)`).
+Incluye soporte para serialización **Apache Avro**; el serializer de Confluent Schema Registry
+debe añadirse en el proyecto consumidor.
 
 **Dependencia:**
 
@@ -212,7 +217,11 @@ library:
 library.kafka.consumer.enabled: true
 ```
 
-> **Nota sobre `library.kafka.consumer.enabled`:** esta propiedad no forma parte del tipo `KafkaLibraryProperties`; se evalúa directamente desde el entorno Spring mediante `@ConditionalOnProperty`. Esto significa que no aparece en el autocompletado del IDE a través de los metadatos de configuración del starter, pero sí funciona correctamente si se define en `application.yml` o como variable de entorno.
+> **Nota sobre `library.kafka.consumer.enabled`:** esta propiedad no forma parte del tipo
+> `KafkaLibraryProperties`; se evalúa directamente desde el entorno Spring mediante
+> `@ConditionalOnProperty`. Por ello no aparece en el autocompletado del IDE a través de los
+> metadatos de configuración del starter, pero funciona correctamente si se define en
+> `application.yml` o como variable de entorno.
 
 **Productor — `LibraryKafkaProducer<V>`:**
 
@@ -549,7 +558,14 @@ target/generated-sources/openapi/
       ProductosController.java
 ```
 
-> **Nota:** cuando se activa el `openapi-generator-maven-plugin` en `<plugins>` (paso 1, opción 4), la generación ocurre en la fase `generate-sources` (es decir, durante `mvn compile` o cualquier fase posterior) y el `build-helper-maven-plugin` registra automáticamente `${openapi.output-dir}/src/main/java` como source root, de modo que el compilador ve las clases generadas en un `mvn package` normal. La generación en tiempo de ejecución vía `ApplicationRunner` (sin el plugin Maven) sólo ocurre al arrancar la aplicación Spring Boot y **no** durante `mvn compile`.
+> **Nota:** cuando se activa el `openapi-generator-maven-plugin` en `<plugins>` (paso 1, opción 4),
+> la generación ocurre en la fase `generate-sources` (es decir, durante `mvn compile` o cualquier
+> fase posterior) y el `build-helper-maven-plugin` registra automáticamente
+> `${openapi.output-dir}/src/main/java` como source root, de modo que el compilador ve las clases
+> generadas en un `mvn package` normal.
+>
+> La generación en tiempo de ejecución vía `ApplicationRunner` (sin el plugin Maven) sólo ocurre al
+> arrancar la aplicación Spring Boot y **no** durante `mvn compile`.
 
 ### Resumen del flujo
 
