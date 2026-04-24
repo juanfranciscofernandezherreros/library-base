@@ -16,7 +16,6 @@
         <module>parent</module>
         <module>bom</module>
         <module>starters</module>
-        <module>starters-test</module>
     </modules>
 
 </project>
