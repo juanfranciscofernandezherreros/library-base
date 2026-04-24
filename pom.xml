@@ -16,6 +16,7 @@
         <module>parent</module>
         <module>bom</module>
         <module>starters</module>
+        <module>microservicio-consumidor</module>
     </modules>
 
 </project>
