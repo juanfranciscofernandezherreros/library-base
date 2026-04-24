@@ -8,7 +8,10 @@
         <groupId>com.github.juanfranciscofernandezherreros</groupId>
         <artifactId>library-base-parent</artifactId>
         <version>1.0.1</version>
-        <relativePath>../../parent/pom.xml</relativePath></artifactId>
+        <relativePath>../../parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>library-base-starter-test</artifactId>
     <packaging>jar</packaging>
 
     <name>library-base-starter-test</name>
