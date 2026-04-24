@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.github.juanfranciscofernandezherreros.library.base.autoconfigure"},{"l":"com.github.juanfranciscofernandezherreros.library.base.service"}];updateSearchResults();
