@@ -40,7 +40,7 @@ public class KafkaLibraryProperties {
     private String zookeeperConnect = "localhost:2181";
 
     /**
-     * Confluent Schema Registry URL used by Avro serialisers/deserialisers.
+     * Confluent Schema Registry URL used by Avro serializers/deserializers.
      * Add {@code io.confluent:kafka-avro-serializer} to your project and configure
      * {@code spring.kafka.producer.value-serializer} / {@code consumer.value-deserializer}
      * to {@code io.confluent.kafka.serializers.KafkaAvroSerializer} /
