@@ -13,7 +13,7 @@
 
     <groupId>com.github.juanfranciscofernandezherreros</groupId>
     <artifactId>library-base-parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1</version>
     <packaging>pom</packaging>
 
     <name>library-base-parent</name>
@@ -27,7 +27,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <!-- Library versions not managed by Spring Boot parent -->
-        <library-base.version>1.0.0-SNAPSHOT</library-base.version>
+        <library-base.version>1.0.1</library-base.version>
 
         <!-- Annotation processor versions -->
         <mapstruct.version>1.5.5.Final</mapstruct.version>
