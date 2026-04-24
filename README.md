@@ -125,7 +125,8 @@ No mandatory configuration — works out of the box.
 # application.yml (optional)
 library:
   base:
-    enabled: true   # default: true
+    application-name: library-base   # default: "library-base"
+    verbose-logging: false           # default: false
 ```
 
 ---
@@ -162,7 +163,8 @@ The parent POM also exposes Maven properties you can override per-project:
 
 ### starter-db
 
-Auto-configures a JPA `DataSource` with Flyway migrations.
+Auto-configures a JPA `DataSource` with a PostgreSQL `JpaVendorAdapter`.  
+Add `spring-boot-starter-data-jpa` to your project to activate.
 
 ```yaml
 # application.yml
@@ -174,16 +176,26 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+    show-sql: false
   flyway:
     enabled: true
     locations: classpath:db/migration
+
+# library-specific overrides
+library:
+  db:
+    default-schema: public   # default: "public"
+    ddl-auto: validate       # default: "validate"
 ```
 
 ---
 
 ### starter-kafka
 
-Auto-configures a Kafka producer, consumer, and Kafka Streams topology.
+Auto-configures a `LibraryKafkaProducer` and an optional `LibraryKafkaConsumer`.  
+`KafkaTemplate` (from `spring-kafka`) must be on the classpath.
+
+The consumer bean is **not** started by default; enable it explicitly to avoid unwanted listeners in producer-only services.
 
 ```yaml
 # application.yml
@@ -193,10 +205,35 @@ spring:
     consumer:
       group-id: my-service-group
       auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+# library-specific configuration
+library:
+  kafka:
+    default-topic: library-events          # default: "library-events"
+    client-id-prefix: library              # default: "library"
+    zookeeper-connect: localhost:2181      # default: "localhost:2181"
+    schema-registry-url: http://localhost:8081  # default: "http://localhost:8081"
+    consumer:
+      enabled: false                       # default: false — set to true to activate the consumer
+    streams:
+      application-id: library-streams-app # default: "library-streams-app"
+      state-dir: /tmp/kafka-streams       # default: "/tmp/kafka-streams"
 ```
+
+`LibraryKafkaProducer` exposes three `send` overloads:
+
+```java
+producer.send(value);                      // → default topic
+producer.send(key, value);                 // → default topic with key
+producer.send(topic, key, value);          // → explicit topic with key
+```
+
+Override `LibraryKafkaConsumer#process(V payload)` in a subclass to add your own message-handling logic.
 
 ---
 
@@ -211,6 +248,24 @@ Add it with `<scope>test</scope>` only:
   <artifactId>library-base-starter-test</artifactId>
   <scope>test</scope>
 </dependency>
+```
+
+**`BaseIntegrationTest`** — abstract base class that applies `@SpringBootTest` and activates the `test` Spring profile:
+
+```java
+@ExtendWith(SpringExtension.class)
+class MyServiceIntegrationTest extends BaseIntegrationTest {
+    // ...
+}
+```
+
+**`EmbeddedKafkaTestConfig`** — `@TestConfiguration` that starts an in-process KRaft Kafka broker (no external broker required):
+
+```java
+@Import(EmbeddedKafkaTestConfig.class)
+class MyKafkaTest extends BaseIntegrationTest {
+    // ...
+}
 ```
 
 ---
