@@ -122,6 +122,18 @@ public class ControllerGenerator {
                         params.append("@RequestParam(value = \"").append(param.getName())
                               .append("\", required = ").append(Boolean.TRUE.equals(param.getRequired())).append(") ")
                               .append(javaType).append(" ").append(sanitizeFieldName(param.getName()));
+                    case "header" -> {
+                        imports.add("org.springframework.web.bind.annotation.RequestHeader");
+                        params.append("@RequestHeader(value = \"").append(param.getName())
+                              .append("\", required = ").append(Boolean.TRUE.equals(param.getRequired())).append(") ")
+                              .append(javaType).append(" ").append(sanitizeFieldName(param.getName()));
+                    }
+                    case "cookie" -> {
+                        imports.add("org.springframework.web.bind.annotation.CookieValue");
+                        params.append("@CookieValue(value = \"").append(param.getName())
+                              .append("\", required = ").append(Boolean.TRUE.equals(param.getRequired())).append(") ")
+                              .append(javaType).append(" ").append(sanitizeFieldName(param.getName()));
+                    }
                     default ->
                         params.append(javaType).append(" ").append(sanitizeFieldName(param.getName()));
                 }

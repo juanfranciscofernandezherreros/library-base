@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -144,11 +143,7 @@ public class OpenApiGeneratorService {
 
     private void writeFile(Path base, String pkg, String className, String source) throws IOException {
         Path dir = base.resolve(pkg.replace('.', '/'));
-        try {
-            Files.createDirectories(dir);
-        } catch (IOException e) {
-            throw new UncheckedIOException("Cannot create output directory: " + dir, e);
-        }
+        Files.createDirectories(dir);
         Path file = dir.resolve(className + ".java");
         Files.writeString(file, source, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         log.debug("Generated: {}", file);
