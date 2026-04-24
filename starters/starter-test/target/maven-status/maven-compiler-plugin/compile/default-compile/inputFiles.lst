@@ -1,3 +1,3 @@
-/home/runner/work/library-base/library-base/starters-test/src/main/java/com/github/juanfranciscofernandezherreros/library/test/support/EmbeddedKafkaTestConfig.java
-/home/runner/work/library-base/library-base/starters-test/src/main/java/com/github/juanfranciscofernandezherreros/library/test/autoconfigure/TestAutoConfiguration.java
-/home/runner/work/library-base/library-base/starters-test/src/main/java/com/github/juanfranciscofernandezherreros/library/test/support/BaseIntegrationTest.java
+/home/runner/work/library-base/library-base/starters/starter-test/src/main/java/com/github/juanfranciscofernandezherreros/library/test/autoconfigure/TestAutoConfiguration.java
+/home/runner/work/library-base/library-base/starters/starter-test/src/main/java/com/github/juanfranciscofernandezherreros/library/test/support/BaseIntegrationTest.java
+/home/runner/work/library-base/library-base/starters/starter-test/src/main/java/com/github/juanfranciscofernandezherreros/library/test/support/EmbeddedKafkaTestConfig.java
