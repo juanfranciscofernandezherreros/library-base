@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.github.juanfranciscofernandezherreros</groupId>
+        <artifactId>library-base-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../parent/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>library-base-starter-test</artifactId>
+    <packaging>jar</packaging>
+
+    <name>library-base-starter-test</name>
+    <description>Test starter — shared testing utilities and base classes for library-base consumers</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.juanfranciscofernandezherreros</groupId>
+            <artifactId>library-base-starter-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- Test utilities exposed as compile-scope so consumers can use them in tests -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka-test</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-testcontainers</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>kafka</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>
