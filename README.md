@@ -7,17 +7,17 @@ Arquitectura base de librería Maven multi-módulo, reutilizable por múltiples 
 ## Estructura de módulos
 
 ```
-library-base/                          ← reactor raíz (packaging: pom)
+library-base/                          ← reactor raíz — library-base-build (packaging: pom)
 ├── parent/                            ← 1) Parent POM común
 │   └── pom.xml
 ├── bom/                               ← 2) Bill of Materials
 │   └── pom.xml
 └── starters/                          ← 3) Starters (lógica reutilizable)
     ├── starter-base/                  ←    utilidades core
-    ├── starter-kafka/                 ←    integración Kafka
+    ├── starter-kafka/                 ←    integración Kafka + Avro
     ├── starter-db/                    ←    integración PostgreSQL / JPA
-    ├── starter-openapi/               ←    generación de código desde spec OpenAPI
-    └── starter-test/                  ←    utilidades de testing compartidas
+    ├── starter-test/                  ←    utilidades de testing compartidas
+    └── starter-openapi/               ←    generación de código desde spec OpenAPI
 ```
 
 ---
@@ -35,15 +35,24 @@ Módulo con `packaging: pom` sin código fuente. Define:
 | Java version | 17 |
 | Source encoding | UTF-8 |
 | Spring Boot parent | 3.2.5 |
-| `maven-compiler-plugin` | annotation processing para **Lombok + MapStruct** |
+| `maven-compiler-plugin` | annotation processing para **Lombok + MapStruct** (ver `annotationProcessorPaths`) |
 | `maven-surefire-plugin` | configuración base de tests unitarios |
-| `maven-failsafe-plugin` | ejecución de tests de integración |
-| `maven-source-plugin` | adjunta fuentes al artefacto |
+| `maven-failsafe-plugin` | ejecución de tests de integración (`integration-test` + `verify`) |
+| `maven-source-plugin` | adjunta fuentes al artefacto (`jar-no-fork`) |
 | `maven-javadoc-plugin` | adjunta Javadoc al artefacto |
 | `spring-boot-maven-plugin` | deshabilitado (`skip: true`) — librerías, no ejecutables |
-| `openapi-generator-maven-plugin` | generación de código en fase `generate-sources` (activar en `<plugins>`) |
-| `build-helper-maven-plugin` | registra `target/generated-sources/openapi` como source root |
+| `openapi-generator-maven-plugin` | v7.4.0 — generación de código en fase `generate-sources` (activar declarando en `<plugins>`) |
+| `build-helper-maven-plugin` | registra `${openapi.output-dir}/src/main/java` como source root |
 | `distributionManagement` | Nexus releases + snapshots (URLs configurables por propiedad) |
+
+**Propiedades OpenAPI sobreescribibles** (en el POM del microservicio o vía `-D` en CI):
+
+| Propiedad | Valor por defecto |
+|---|---|
+| `openapi.spec-path` | `${project.basedir}/src/main/resources/openapi.yaml` |
+| `openapi.output-dir` | `${project.build.directory}/generated-sources/openapi` |
+| `openapi.api-package` | `${project.groupId}.api` |
+| `openapi.model-package` | `${project.groupId}.api.model` |
 
 #### Uso como parent en un microservicio
 
@@ -81,7 +90,25 @@ mvn deploy \
 
 **Artefacto:** `com.github.juanfranciscofernandezherreros:library-base-bom`
 
-Centraliza las versiones de todos los módulos de la librería. Permite a los consumidores importarlo en `dependencyManagement` y no tener que indicar versiones de forma explícita.
+Centraliza las versiones de todos los módulos de la librería y sus dependencias transitivas. Permite a los consumidores importarlo en `dependencyManagement` sin tener que indicar versiones de forma explícita.
+
+**Versiones gestionadas:**
+
+| Librería | Versión |
+|---|---|
+| Spring Boot BOM | 3.2.5 |
+| Lombok | 1.18.32 |
+| MapStruct | 1.5.5.Final |
+| Springdoc OpenAPI | 2.3.0 |
+| PostgreSQL driver | 42.7.3 |
+| H2 (tests) | 2.2.224 |
+| Apache Kafka | 3.9.2 |
+| Apache Avro | 1.11.4 |
+| JUnit Jupiter | 5.10.2 |
+| Mockito | 5.7.0 |
+| Zookeeper | 3.8.6 |
+| swagger-parser | 2.1.22 |
+| jackson-databind-nullable | 0.2.6 |
 
 #### Uso en un microservicio
 
@@ -116,7 +143,7 @@ Tras importar el BOM, las dependencias individuales no necesitan versión:
 
 #### 3.1 `library-base-starter-base` — Utilidades core
 
-Proporciona auto-configuración base y el bean `BaseService`.
+Proporciona auto-configuración base y el bean `BaseService`. Se activa automáticamente al incluir la dependencia (Spring Boot auto-configuration).
 
 **Dependencia:**
 
@@ -150,7 +177,7 @@ baseService.isVerboseLogging();     // → true
 
 #### 3.2 `library-base-starter-kafka` — Integración Kafka
 
-Proporciona un productor Kafka genérico (`LibraryKafkaProducer`), un consumidor base (`LibraryKafkaConsumer`) y configuración de Kafka Streams (`LibraryKafkaStreamsConfig`). Se activa únicamente si `KafkaTemplate` está en el classpath.
+Proporciona un productor Kafka genérico (`LibraryKafkaProducer`), un consumidor base (`LibraryKafkaConsumer`) y configuración de Kafka Streams (`LibraryKafkaStreamsConfig`). Se activa únicamente si `KafkaTemplate` está en el classpath. Incluye soporte para serialización **Apache Avro** (el serializer de Confluent Schema Registry debe añadirse en el proyecto consumidor).
 
 **Dependencia:**
 
@@ -164,17 +191,24 @@ Proporciona un productor Kafka genérico (`LibraryKafkaProducer`), un consumidor
 **Propiedades configurables** (`application.yml`):
 
 ```yaml
+spring:
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: mi-consumer-group
+      auto-offset-reset: earliest
+
 library:
   kafka:
-    default-topic: mis-eventos          # topic por defecto (default: library-events)
-    client-id-prefix: mi-servicio       # prefijo del clientId productor (default: library)
-    zookeeper-connect: localhost:2181   # conexión ZooKeeper para clústeres pre-KRaft (default: localhost:2181)
+    default-topic: mis-eventos           # topic por defecto (default: library-events)
+    client-id-prefix: mi-servicio        # prefijo del clientId productor (default: library)
+    zookeeper-connect: localhost:2181    # conexión ZooKeeper para clústeres pre-KRaft (default: localhost:2181)
     schema-registry-url: http://localhost:8081  # URL del Schema Registry Confluent (default: http://localhost:8081)
     consumer:
-      enabled: true                     # activa el bean LibraryKafkaConsumer (default: false)
+      enabled: true                      # activa el bean LibraryKafkaConsumer (default: false)
     streams:
-      application-id: mi-streams-app   # ID de la topología Kafka Streams (default: library-streams-app)
-      state-dir: /tmp/kafka-streams    # directorio de estado local (default: /tmp/kafka-streams)
+      application-id: mi-streams-app    # ID de la topología Kafka Streams (default: library-streams-app)
+      state-dir: /tmp/kafka-streams     # directorio de estado local (default: /tmp/kafka-streams)
 ```
 
 **Productor — `LibraryKafkaProducer<V>`:**
@@ -193,6 +227,8 @@ producer.send("clave", miEvento);
 producer.send("otro-topic", "clave", miEvento);
 ```
 
+Los tres métodos devuelven `CompletableFuture<SendResult<String, V>>`.
+
 **Consumidor — `LibraryKafkaConsumer<V>`:**
 
 El bean se registra sólo cuando `library.kafka.consumer.enabled=true`. La clase escucha el topic configurado en `library.kafka.default-topic` usando el `group-id` de `spring.kafka.consumer.group-id`. Para personalizar el procesamiento, extiende la clase y sobreescribe `process()`:
@@ -210,7 +246,7 @@ public class MiConsumer extends LibraryKafkaConsumer<MiEvento> {
 
 **Kafka Streams — `LibraryKafkaStreamsConfig`:**
 
-Proporciona la configuración por defecto de Kafka Streams. Para activarlo, importa la clase en tu aplicación:
+Proporciona la configuración por defecto de Kafka Streams (application ID, bootstrap servers, Serde String por defecto, state dir). Para activarlo, importa la clase en tu aplicación:
 
 ```java
 @Import(LibraryKafkaStreamsConfig.class)
@@ -218,13 +254,13 @@ Proporciona la configuración por defecto de Kafka Streams. Para activarlo, impo
 public class MiApplication { }
 ```
 
-El bean registra una topología de paso directo sobre `library.kafka.default-topic`. Sobreescribe el bean `libraryKStream` para añadir tu propia lógica de streaming.
+El bean `libraryKStream` registra una topología de paso directo (pass-through) sobre `library.kafka.default-topic`. Sobreescribe el bean en tu aplicación para añadir lógica de streaming propia.
 
 ---
 
 #### 3.3 `library-base-starter-db` — Integración PostgreSQL / JPA
 
-Proporciona auto-configuración de Spring Data JPA con PostgreSQL. Incluye H2 en scope `test` para pruebas en memoria.
+Proporciona auto-configuración de Spring Data JPA con PostgreSQL. Registra un `HibernateJpaVendorAdapter` preconfigurado para PostgreSQL. La DataSource y el `EntityManagerFactory` son gestionados por la auto-configuración estándar de Spring Boot. Incluye H2 en scope `test` para pruebas en memoria.
 
 **Dependencia:**
 
@@ -258,7 +294,9 @@ library:
 
 #### 3.4 `library-base-starter-openapi` — Generación de código desde spec OpenAPI
 
-Lee un fichero de especificación OpenAPI 3 (YAML o JSON) y genera automáticamente DTOs e interfaces de controlador al arrancar la aplicación. Las fuentes se escriben en `target/generated-sources/openapi` por defecto.
+Lee un fichero de especificación OpenAPI 3 (YAML o JSON) y genera automáticamente DTOs e interfaces de controlador al arrancar la aplicación mediante un `ApplicationRunner`. Las fuentes se escriben en `target/generated-sources/openapi` por defecto.
+
+> **Generación en tiempo de compilación:** el `parent` también declara en `pluginManagement` el `openapi-generator-maven-plugin` v7.4.0. Si necesitas que el código generado esté disponible para el compilador en la fase `compile`, actívalo en la sección `<plugins>` de tu POM (ver [Guía: usar como parent + OpenAPI YAML](#guía-usar-como-parent--openapi-yaml)).
 
 **Dependencia:**
 
@@ -300,7 +338,7 @@ Consulta el apartado [Guía: usar como parent + OpenAPI YAML](#guía-usar-como-p
 
 #### 3.5 `library-base-starter-test` — Utilidades de testing compartidas
 
-Agrupa utilidades de testing: `EmbeddedKafkaTestConfig` (broker Kafka en memoria) y clase base `BaseIntegrationTest`.
+Agrupa utilidades de testing: `EmbeddedKafkaTestConfig` (broker Kafka en memoria con KRaft), clase base `BaseIntegrationTest` y soporte para **Testcontainers**.
 
 **Dependencia** (scope `test`):
 
@@ -312,7 +350,15 @@ Agrupa utilidades de testing: `EmbeddedKafkaTestConfig` (broker Kafka en memoria
 </dependency>
 ```
 
-**`BaseIntegrationTest`** — clase base que activa `@SpringBootTest` y el perfil `test`:
+**Dependencias transitivas incluidas:**
+- `spring-boot-starter-test`
+- `spring-kafka-test`
+- `spring-boot-testcontainers`
+- `org.testcontainers:junit-jupiter`
+- `org.testcontainers:kafka`
+- `com.h2database:h2`
+
+**`BaseIntegrationTest`** — clase base abstracta que activa `@SpringBootTest` y el perfil `test`:
 
 ```java
 @ExtendWith(SpringExtension.class)
@@ -328,7 +374,7 @@ class MiServicioIntegrationTest extends BaseIntegrationTest {
 }
 ```
 
-**`EmbeddedKafkaTestConfig`** — arranca un broker Kafka en memoria (KRaft) para tests que requieren Kafka sin un broker externo. Impórtalo explícitamente en la clase de test:
+**`EmbeddedKafkaTestConfig`** — arranca un broker Kafka en memoria (KRaft, modo single-node) para tests que requieren Kafka sin un broker externo. Impórtalo explícitamente en la clase de test:
 
 ```java
 @Import(EmbeddedKafkaTestConfig.class)
@@ -354,7 +400,7 @@ El `parent` configura `annotationProcessorPaths` en el orden correcto:
 2. `mapstruct-processor` — genera implementaciones de mappers
 3. `lombok-mapstruct-binding` — garantiza el orden de procesamiento
 
-No es necesario ninguna configuración adicional en los módulos consumidores.
+No es necesaria ninguna configuración adicional en los módulos consumidores.
 
 ---
 
@@ -405,12 +451,26 @@ Esta sección describe cómo crear un microservicio que:
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- 3) Starter OpenAPI — genera DTOs y controllers desde el YAML -->
+        <!-- 3) Starter OpenAPI — genera DTOs y controllers desde el YAML en tiempo de ejecución -->
         <dependency>
             <groupId>com.github.juanfranciscofernandezherreros</groupId>
             <artifactId>library-base-starter-openapi</artifactId>
         </dependency>
     </dependencies>
+
+    <!-- 4) Opcional: activar generación en tiempo de compilación con el plugin Maven -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>
 ```
 
@@ -486,26 +546,7 @@ target/generated-sources/openapi/
       ProductosController.java
 ```
 
-> **Nota:** para que el compilador vea las clases generadas en un `mvn package` normal, añade el directorio de salida como source root con el plugin `build-helper-maven-plugin`:
->
-> ```xml
-> <plugin>
->     <groupId>org.codehaus.mojo</groupId>
->     <artifactId>build-helper-maven-plugin</artifactId>
->     <executions>
->         <execution>
->             <id>add-generated-sources</id>
->             <phase>generate-sources</phase>
->             <goals><goal>add-source</goal></goals>
->             <configuration>
->                 <sources>
->                     <source>target/generated-sources/openapi</source>
->                 </sources>
->             </configuration>
->         </execution>
->     </executions>
-> </plugin>
-> ```
+> **Nota:** cuando se activa el `openapi-generator-maven-plugin` en `<plugins>` (paso 1, opción 4), la generación ocurre en la fase `generate-sources` y el `build-helper-maven-plugin` registra automáticamente `${openapi.output-dir}/src/main/java` como source root, de modo que el compilador ve las clases generadas en un `mvn package` normal.
 
 ### Resumen del flujo
 
@@ -513,7 +554,7 @@ target/generated-sources/openapi/
 pom.xml
   └─ parent: library-base-parent       ← hereda plugins, Java 17, Lombok/MapStruct
   └─ BOM import: library-base-bom      ← gestiona versiones de todos los starters
-  └─ dep: library-base-starter-openapi ← activa la generación
+  └─ dep: library-base-starter-openapi ← activa la generación en tiempo de ejecución
 
 src/main/resources/openapi.yaml        ← tu especificación OpenAPI 3
 
@@ -522,6 +563,10 @@ application.yml
 
 mvn compile / spring-boot:run
   → ApplicationRunner genera DTOs + Controllers en target/generated-sources/openapi/
+
+mvn compile (con plugin activado en <plugins>)
+  → openapi-generator-maven-plugin genera en fase generate-sources
+  → build-helper-maven-plugin registra el directorio como source root
 ```
 
 ---
@@ -563,4 +608,4 @@ Las credenciales se configuran en `~/.m2/settings.xml`:
 mvn clean install
 ```
 
-Construye todos los módulos en el orden correcto: `parent` → `bom` → `starters/starter-base` → `starters/starter-kafka` → `starters/starter-db` → `starters/starter-openapi` → `starters/starter-test`.
+Construye todos los módulos en el orden correcto: `parent` → `bom` → `starters/starter-base` → `starters/starter-kafka` → `starters/starter-db` → `starters/starter-test` → `starters/starter-openapi`.
