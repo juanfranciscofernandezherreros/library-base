@@ -47,6 +47,9 @@
 
         <!-- OpenAPI spec parser -->
         <swagger-parser.version>2.1.22</swagger-parser.version>
+
+        <!-- Jackson Databind Nullable (OpenAPI nullable support) -->
+        <jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
     </properties>
 
     <dependencyManagement>
@@ -87,6 +90,20 @@
                 <groupId>com.github.juanfranciscofernandezherreros</groupId>
                 <artifactId>library-base-starter-openapi</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+
+            <!-- ===== Spring Boot Web ===== -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring-boot.version}</version>
+            </dependency>
+
+            <!-- ===== Jackson Databind Nullable (OpenAPI nullable support) ===== -->
+            <dependency>
+                <groupId>org.openapitools</groupId>
+                <artifactId>jackson-databind-nullable</artifactId>
+                <version>${jackson-databind-nullable.version}</version>
             </dependency>
 
             <!-- ===== Lombok ===== -->
