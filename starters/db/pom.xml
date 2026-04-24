@@ -8,14 +8,14 @@
         <groupId>com.github.juanfranciscofernandezherreros</groupId>
         <artifactId>library-base-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../parent/pom.xml</relativePath>
+        <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
-    <artifactId>library-base-starter-test</artifactId>
+    <artifactId>library-base-starter-db</artifactId>
     <packaging>jar</packaging>
 
-    <name>library-base-starter-test</name>
-    <description>Test starter — shared testing utilities and base classes for library-base consumers</description>
+    <name>library-base-starter-db</name>
+    <description>DB starter — auto-configuration and utilities for PostgreSQL integration</description>
 
     <dependencies>
         <dependency>
@@ -23,31 +23,30 @@
             <artifactId>library-base-starter-base</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- Test utilities exposed as compile-scope so consumers can use them in tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka-test</artifactId>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-testcontainers</artifactId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>kafka</artifactId>
-        </dependency>
-        <!-- H2 in-memory database for lightweight unit tests that do not need Testcontainers -->
+        <!-- In-memory database for tests -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
