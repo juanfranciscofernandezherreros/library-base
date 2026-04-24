@@ -41,6 +41,8 @@ Módulo con `packaging: pom` sin código fuente. Define:
 | `maven-source-plugin` | adjunta fuentes al artefacto |
 | `maven-javadoc-plugin` | adjunta Javadoc al artefacto |
 | `spring-boot-maven-plugin` | deshabilitado (`skip: true`) — librerías, no ejecutables |
+| `openapi-generator-maven-plugin` | generación de código en fase `generate-sources` (activar en `<plugins>`) |
+| `build-helper-maven-plugin` | registra `target/generated-sources/openapi` como source root |
 | `distributionManagement` | Nexus releases + snapshots (URLs configurables por propiedad) |
 
 #### Uso como parent en un microservicio
@@ -148,7 +150,7 @@ baseService.isVerboseLogging();     // → true
 
 #### 3.2 `library-base-starter-kafka` — Integración Kafka
 
-Proporciona un productor Kafka genérico (`LibraryKafkaProducer`) con auto-configuración. Se activa únicamente si `KafkaTemplate` está en el classpath.
+Proporciona un productor Kafka genérico (`LibraryKafkaProducer`), un consumidor base (`LibraryKafkaConsumer`) y configuración de Kafka Streams (`LibraryKafkaStreamsConfig`). Se activa únicamente si `KafkaTemplate` está en el classpath.
 
 **Dependencia:**
 
@@ -164,11 +166,18 @@ Proporciona un productor Kafka genérico (`LibraryKafkaProducer`) con auto-confi
 ```yaml
 library:
   kafka:
-    default-topic: mis-eventos       # topic por defecto (default: library-events)
-    client-id-prefix: mi-servicio    # prefijo del clientId productor (default: library)
+    default-topic: mis-eventos          # topic por defecto (default: library-events)
+    client-id-prefix: mi-servicio       # prefijo del clientId productor (default: library)
+    zookeeper-connect: localhost:2181   # conexión ZooKeeper para clústeres pre-KRaft (default: localhost:2181)
+    schema-registry-url: http://localhost:8081  # URL del Schema Registry Confluent (default: http://localhost:8081)
+    consumer:
+      enabled: true                     # activa el bean LibraryKafkaConsumer (default: false)
+    streams:
+      application-id: mi-streams-app   # ID de la topología Kafka Streams (default: library-streams-app)
+      state-dir: /tmp/kafka-streams    # directorio de estado local (default: /tmp/kafka-streams)
 ```
 
-**Bean disponible:**
+**Productor — `LibraryKafkaProducer<V>`:**
 
 ```java
 @Autowired
@@ -183,6 +192,33 @@ producer.send("clave", miEvento);
 // Enviar a un topic explícito
 producer.send("otro-topic", "clave", miEvento);
 ```
+
+**Consumidor — `LibraryKafkaConsumer<V>`:**
+
+El bean se registra sólo cuando `library.kafka.consumer.enabled=true`. La clase escucha el topic configurado en `library.kafka.default-topic` usando el `group-id` de `spring.kafka.consumer.group-id`. Para personalizar el procesamiento, extiende la clase y sobreescribe `process()`:
+
+```java
+@Component
+public class MiConsumer extends LibraryKafkaConsumer<MiEvento> {
+
+    @Override
+    protected void process(MiEvento payload) {
+        // lógica de negocio
+    }
+}
+```
+
+**Kafka Streams — `LibraryKafkaStreamsConfig`:**
+
+Proporciona la configuración por defecto de Kafka Streams. Para activarlo, importa la clase en tu aplicación:
+
+```java
+@Import(LibraryKafkaStreamsConfig.class)
+@SpringBootApplication
+public class MiApplication { }
+```
+
+El bean registra una topología de paso directo sobre `library.kafka.default-topic`. Sobreescribe el bean `libraryKStream` para añadir tu propia lógica de streaming.
 
 ---
 
@@ -264,7 +300,7 @@ Consulta el apartado [Guía: usar como parent + OpenAPI YAML](#guía-usar-como-p
 
 #### 3.5 `library-base-starter-test` — Utilidades de testing compartidas
 
-Agrupa utilidades de testing: EmbeddedKafka y clase base `BaseIntegrationTest`.
+Agrupa utilidades de testing: `EmbeddedKafkaTestConfig` (broker Kafka en memoria) y clase base `BaseIntegrationTest`.
 
 **Dependencia** (scope `test`):
 
@@ -276,7 +312,7 @@ Agrupa utilidades de testing: EmbeddedKafka y clase base `BaseIntegrationTest`.
 </dependency>
 ```
 
-**Uso:**
+**`BaseIntegrationTest`** — clase base que activa `@SpringBootTest` y el perfil `test`:
 
 ```java
 @ExtendWith(SpringExtension.class)
@@ -288,6 +324,22 @@ class MiServicioIntegrationTest extends BaseIntegrationTest {
     @Test
     void deberiaFuncionar() {
         // perfil "test" activo automáticamente
+    }
+}
+```
+
+**`EmbeddedKafkaTestConfig`** — arranca un broker Kafka en memoria (KRaft) para tests que requieren Kafka sin un broker externo. Impórtalo explícitamente en la clase de test:
+
+```java
+@Import(EmbeddedKafkaTestConfig.class)
+class MiKafkaTest extends BaseIntegrationTest {
+
+    @Autowired
+    EmbeddedKafkaBroker broker;
+
+    @Test
+    void deberiaPublicarMensaje() {
+        // broker disponible en el contexto
     }
 }
 ```
