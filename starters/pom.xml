@@ -18,9 +18,10 @@
     <description>Aggregator for library-base starter modules</description>
 
     <modules>
-        <module>base</module>
-        <module>kafka</module>
-        <module>db</module>
+        <module>starter-base</module>
+        <module>starter-kafka</module>
+        <module>starter-db</module>
+        <module>starter-test</module>
     </modules>
 
 </project>
