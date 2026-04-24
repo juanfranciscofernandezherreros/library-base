@@ -177,7 +177,12 @@ baseService.isVerboseLogging();     // → true
 
 #### 3.2 `library-base-starter-kafka` — Integración Kafka
 
-Proporciona un productor Kafka genérico (`LibraryKafkaProducer`), un consumidor base (`LibraryKafkaConsumer`) y configuración de Kafka Streams (`LibraryKafkaStreamsConfig`). Se activa únicamente si `KafkaTemplate` está en el classpath. Incluye soporte para serialización **Apache Avro** (el serializer de Confluent Schema Registry debe añadirse en el proyecto consumidor).
+Proporciona un productor Kafka genérico (`LibraryKafkaProducer`), un consumidor base
+(`LibraryKafkaConsumer`) y configuración de Kafka Streams (`LibraryKafkaStreamsConfig`).
+Se activa únicamente si `KafkaTemplate` está en el classpath
+(`@ConditionalOnClass(KafkaTemplate.class)`).
+Incluye soporte para serialización **Apache Avro**; el serializer de Confluent Schema Registry
+debe añadirse en el proyecto consumidor.
 
 **Dependencia:**
 
@@ -204,12 +209,19 @@ library:
     client-id-prefix: mi-servicio        # prefijo del clientId productor (default: library)
     zookeeper-connect: localhost:2181    # conexión ZooKeeper para clústeres pre-KRaft (default: localhost:2181)
     schema-registry-url: http://localhost:8081  # URL del Schema Registry Confluent (default: http://localhost:8081)
-    consumer:
-      enabled: true                      # activa el bean LibraryKafkaConsumer (default: false)
     streams:
       application-id: mi-streams-app    # ID de la topología Kafka Streams (default: library-streams-app)
       state-dir: /tmp/kafka-streams     # directorio de estado local (default: /tmp/kafka-streams)
+
+# Propiedad de entorno independiente — activa el bean LibraryKafkaConsumer (default: false)
+library.kafka.consumer.enabled: true
 ```
+
+> **Nota sobre `library.kafka.consumer.enabled`:** esta propiedad no forma parte del tipo
+> `KafkaLibraryProperties`; se evalúa directamente desde el entorno Spring mediante
+> `@ConditionalOnProperty`. Por ello no aparece en el autocompletado del IDE a través de los
+> metadatos de configuración del starter, pero funciona correctamente si se define en
+> `application.yml` o como variable de entorno.
 
 **Productor — `LibraryKafkaProducer<V>`:**
 
@@ -231,7 +243,7 @@ Los tres métodos devuelven `CompletableFuture<SendResult<String, V>>`.
 
 **Consumidor — `LibraryKafkaConsumer<V>`:**
 
-El bean se registra sólo cuando `library.kafka.consumer.enabled=true`. La clase escucha el topic configurado en `library.kafka.default-topic` usando el `group-id` de `spring.kafka.consumer.group-id`. Para personalizar el procesamiento, extiende la clase y sobreescribe `process()`:
+El bean se registra sólo cuando la propiedad de entorno `library.kafka.consumer.enabled=true`. La clase escucha el topic configurado en `library.kafka.default-topic` usando el `group-id` de `spring.kafka.consumer.group-id`. Para personalizar el procesamiento, extiende la clase y sobreescribe `process()`:
 
 ```java
 @Component
@@ -374,7 +386,7 @@ class MiServicioIntegrationTest extends BaseIntegrationTest {
 }
 ```
 
-**`EmbeddedKafkaTestConfig`** — arranca un broker Kafka en memoria (KRaft, modo single-node) para tests que requieren Kafka sin un broker externo. Impórtalo explícitamente en la clase de test:
+**`EmbeddedKafkaTestConfig`** — arranca un broker Kafka en memoria (KRaft, modo single-node) para tests que requieren Kafka sin un broker externo. La auto-configuración del starter (`TestAutoConfiguration`) lo importa automáticamente cuando `spring-kafka-test` está en el classpath, por lo que normalmente no es necesaria ninguna acción adicional. Si necesitas registrarlo de forma explícita en una clase de test concreta, impórtalo directamente:
 
 ```java
 @Import(EmbeddedKafkaTestConfig.class)
@@ -533,9 +545,9 @@ library:
     enabled: true
 ```
 
-### Paso 4 — Compilar
+### Paso 4 — Ejecutar la aplicación
 
-Al ejecutar `mvn spring-boot:run` o `mvn compile`, el `ApplicationRunner` del starter lee el YAML y escribe los ficheros generados bajo `target/generated-sources/openapi/`:
+Al arrancar la aplicación (`mvn spring-boot:run`), el `ApplicationRunner` del starter lee el YAML y escribe los ficheros generados bajo `target/generated-sources/openapi/`:
 
 ```
 target/generated-sources/openapi/
@@ -546,7 +558,14 @@ target/generated-sources/openapi/
       ProductosController.java
 ```
 
-> **Nota:** cuando se activa el `openapi-generator-maven-plugin` en `<plugins>` (paso 1, opción 4), la generación ocurre en la fase `generate-sources` y el `build-helper-maven-plugin` registra automáticamente `${openapi.output-dir}/src/main/java` como source root, de modo que el compilador ve las clases generadas en un `mvn package` normal.
+> **Nota:** cuando se activa el `openapi-generator-maven-plugin` en `<plugins>` (paso 1, opción 4),
+> la generación ocurre en la fase `generate-sources` (es decir, durante `mvn compile` o cualquier
+> fase posterior) y el `build-helper-maven-plugin` registra automáticamente
+> `${openapi.output-dir}/src/main/java` como source root, de modo que el compilador ve las clases
+> generadas en un `mvn package` normal.
+>
+> La generación en tiempo de ejecución vía `ApplicationRunner` (sin el plugin Maven) sólo ocurre al
+> arrancar la aplicación Spring Boot y **no** durante `mvn compile`.
 
 ### Resumen del flujo
 
@@ -561,7 +580,7 @@ src/main/resources/openapi.yaml        ← tu especificación OpenAPI 3
 application.yml
   library.openapi.spec-path: ...       ← apunta al YAML
 
-mvn compile / spring-boot:run
+mvn spring-boot:run (arranque de la aplicación)
   → ApplicationRunner genera DTOs + Controllers en target/generated-sources/openapi/
 
 mvn compile (con plugin activado en <plugins>)
