@@ -4,14 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.github.juanfranciscofernandezherreros</groupId>
-        <artifactId>library-base-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
-        <relativePath>../parent/pom.xml</relativePath>
-    </parent>
-
+    <groupId>com.github.juanfranciscofernandezherreros</groupId>
     <artifactId>library-base-bom</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>library-base-bom</name>
@@ -22,25 +17,25 @@
         <spring-boot.version>3.2.5</spring-boot.version>
 
         <!-- Annotation processors -->
-        <!-- lombok.version is provided by spring-boot-dependencies -->
-        <!-- mapstruct.version is defined in library-base-parent -->
+        <lombok.version>1.18.32</lombok.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
 
         <!-- OpenAPI / Springdoc -->
         <springdoc-openapi.version>2.3.0</springdoc-openapi.version>
 
         <!-- Database drivers -->
-        <!-- postgresql.version is provided by spring-boot-dependencies -->
-        <!-- h2.version is provided by spring-boot-dependencies -->
+        <postgresql.version>42.7.3</postgresql.version>
+        <h2.version>2.2.224</h2.version>
 
         <!-- Kafka -->
-        <!-- kafka.version is provided by spring-boot-dependencies (via spring-kafka) -->
+        <kafka.version>3.9.2</kafka.version>
 
         <!-- Avro / AVDL -->
         <avro.version>1.11.4</avro.version>
 
         <!-- Test -->
-        <!-- junit-jupiter.version is provided by spring-boot-dependencies -->
-        <!-- mockito.version is provided by spring-boot-dependencies -->
+        <junit-jupiter.version>5.10.2</junit-jupiter.version>
+        <mockito.version>5.7.0</mockito.version>
 
         <!-- Zookeeper (Kafka compatibility) -->
         <zookeeper.version>3.8.6</zookeeper.version>
