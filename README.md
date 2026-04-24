@@ -79,9 +79,9 @@ mvn deploy \
 
 **Artefacto:** `com.github.juanfranciscofernandezherreros:library-base-bom`
 
-Centraliza las versiones de todos los módulos de la librería. Permite a los consumidores importarlo en `dependencyManagement` y no tener que indicar versiones de forma explícita.
+Centraliza las versiones de todos los módulos de la librería. Se mantiene por compatibilidad con proyectos que no usen `library-base-parent` como parent. Los microservicios que **sí** usen `library-base-parent` no necesitan importarlo: la gestión de versiones ya está incluida en el parent.
 
-#### Uso en un microservicio
+#### Uso en un microservicio sin `library-base-parent`
 
 ```xml
 <dependencyManagement>
@@ -315,6 +315,8 @@ Esta sección describe cómo crear un microservicio que:
 
 ### Paso 1 — `pom.xml` del microservicio
 
+El microservicio sólo necesita declarar el parent y sus dependencias. La gestión de versiones (dependencyManagement) ya está incluida en `library-base-parent`.
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -322,7 +324,7 @@ Esta sección describe cómo crear un microservicio que:
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- 1) Heredar la configuración de plugins, Lombok/MapStruct y distribución -->
+    <!-- Heredar la configuración de plugins, Lombok/MapStruct, versiones y distribución -->
     <parent>
         <groupId>com.github.juanfranciscofernandezherreros</groupId>
         <artifactId>library-base-parent</artifactId>
@@ -333,19 +335,6 @@ Esta sección describe cómo crear un microservicio que:
     <artifactId>mi-microservicio</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <dependencyManagement>
-        <!-- 2) Importar el BOM para no repetir versiones en cada dependencia -->
-        <dependencies>
-            <dependency>
-                <groupId>com.github.juanfranciscofernandezherreros</groupId>
-                <artifactId>library-base-bom</artifactId>
-                <version>1.0.0-SNAPSHOT</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <!-- Spring Boot Web -->
         <dependency>
@@ -353,7 +342,7 @@ Esta sección describe cómo crear un microservicio que:
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- 3) Starter OpenAPI — genera DTOs y controllers desde el YAML -->
+        <!-- Starter OpenAPI — genera DTOs y controllers desde el YAML -->
         <dependency>
             <groupId>com.github.juanfranciscofernandezherreros</groupId>
             <artifactId>library-base-starter-openapi</artifactId>
@@ -459,8 +448,7 @@ target/generated-sources/openapi/
 
 ```
 pom.xml
-  └─ parent: library-base-parent       ← hereda plugins, Java 17, Lombok/MapStruct
-  └─ BOM import: library-base-bom      ← gestiona versiones de todos los starters
+  └─ parent: library-base-parent       ← hereda plugins, Java 17, Lombok/MapStruct y versiones
   └─ dep: library-base-starter-openapi ← activa la generación
 
 src/main/resources/openapi.yaml        ← tu especificación OpenAPI 3

@@ -17,38 +17,6 @@
     <name>library-base-bom</name>
     <description>Bill of Materials for library-base — centralises all module versions</description>
 
-    <properties>
-        <!-- Spring Boot -->
-        <spring-boot.version>3.2.5</spring-boot.version>
-
-        <!-- Annotation processors -->
-        <!-- lombok.version is provided by spring-boot-dependencies -->
-        <!-- mapstruct.version is defined in library-base-parent -->
-
-        <!-- OpenAPI / Springdoc -->
-        <springdoc-openapi.version>2.3.0</springdoc-openapi.version>
-
-        <!-- Database drivers -->
-        <!-- postgresql.version is provided by spring-boot-dependencies -->
-        <!-- h2.version is provided by spring-boot-dependencies -->
-
-        <!-- Kafka -->
-        <!-- kafka.version is provided by spring-boot-dependencies (via spring-kafka) -->
-
-        <!-- Avro / AVDL -->
-        <avro.version>1.11.4</avro.version>
-
-        <!-- Test -->
-        <!-- junit-jupiter.version is provided by spring-boot-dependencies -->
-        <!-- mockito.version is provided by spring-boot-dependencies -->
-
-        <!-- Zookeeper (Kafka compatibility) -->
-        <zookeeper.version>3.8.6</zookeeper.version>
-
-        <!-- OpenAPI spec parser -->
-        <swagger-parser.version>2.1.22</swagger-parser.version>
-    </properties>
-
     <dependencyManagement>
         <dependencies>
 

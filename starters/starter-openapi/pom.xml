@@ -17,10 +17,6 @@
     <name>library-base-starter-openapi</name>
     <description>OpenAPI starter — reads an OpenAPI spec and generates controller stubs and DTOs</description>
 
-    <properties>
-        <swagger-parser.version>2.1.22</swagger-parser.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
