@@ -36,6 +36,14 @@
         <!-- Distribution repository URLs — override in CI or ~/.m2/settings.xml -->
         <nexus.releases.url>https://your-nexus-host/repository/maven-releases/</nexus.releases.url>
         <nexus.snapshots.url>https://your-nexus-host/repository/maven-snapshots/</nexus.snapshots.url>
+
+        <!-- OpenAPI code generation -->
+        <openapi-generator.version>7.4.0</openapi-generator.version>
+        <!-- Override these in the consuming project's <properties> section -->
+        <openapi.spec-path>${project.basedir}/src/main/resources/openapi.yaml</openapi.spec-path>
+        <openapi.output-dir>${project.build.directory}/generated-sources/openapi</openapi.output-dir>
+        <openapi.api-package>${project.groupId}.api</openapi.api-package>
+        <openapi.model-package>${project.groupId}.api.model</openapi.model-package>
     </properties>
 
     <build>
@@ -85,6 +93,53 @@
                                 <goal>integration-test</goal>
                                 <goal>verify</goal>
                             </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <!-- OpenAPI compile-time code generation — declare in <plugins> to activate -->
+                <plugin>
+                    <groupId>org.openapitools</groupId>
+                    <artifactId>openapi-generator-maven-plugin</artifactId>
+                    <version>${openapi-generator.version}</version>
+                    <executions>
+                        <execution>
+                            <id>generate-api</id>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+                            <configuration>
+                                <inputSpec>${openapi.spec-path}</inputSpec>
+                                <generatorName>spring</generatorName>
+                                <output>${openapi.output-dir}</output>
+                                <apiPackage>${openapi.api-package}</apiPackage>
+                                <modelPackage>${openapi.model-package}</modelPackage>
+                                <configOptions>
+                                    <interfaceOnly>true</interfaceOnly>
+                                    <useSpringBoot3>true</useSpringBoot3>
+                                    <useTags>true</useTags>
+                                    <skipDefaultInterface>true</skipDefaultInterface>
+                                </configOptions>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <!-- Registers generated sources so the compiler picks them up -->
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>add-generated-sources</id>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>${openapi.output-dir}/src/main/java</source>
+                                </sources>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
