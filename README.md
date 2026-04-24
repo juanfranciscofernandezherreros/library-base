@@ -12,11 +12,12 @@ library-base/                          ← reactor raíz (packaging: pom)
 │   └── pom.xml
 ├── bom/                               ← 2) Bill of Materials
 │   └── pom.xml
-├── starters/                          ← 3) Starters (lógica reutilizable)
-│   ├── base/                          ←    starter-base: utilidades core
-│   └── kafka/                         ←    starter-kafka: integración Kafka
-└── starters-test/                     ← 4) Starter de testing compartido
-    └── pom.xml
+└── starters/                          ← 3) Starters (lógica reutilizable)
+    ├── starter-base/                  ←    utilidades core
+    ├── starter-kafka/                 ←    integración Kafka
+    ├── starter-db/                    ←    integración PostgreSQL / JPA
+    ├── starter-openapi/               ←    generación de código desde spec OpenAPI
+    └── starter-test/                  ←    utilidades de testing compartidas
 ```
 
 ---
@@ -33,6 +34,7 @@ Módulo con `packaging: pom` sin código fuente. Define:
 |---|---|
 | Java version | 17 |
 | Source encoding | UTF-8 |
+| Spring Boot parent | 3.2.5 |
 | `maven-compiler-plugin` | annotation processing para **Lombok + MapStruct** |
 | `maven-surefire-plugin` | configuración base de tests unitarios |
 | `maven-failsafe-plugin` | ejecución de tests de integración |
@@ -184,9 +186,85 @@ producer.send("otro-topic", "clave", miEvento);
 
 ---
 
-### 4. Starter de Testing — `library-base-starter-test`
+#### 3.3 `library-base-starter-db` — Integración PostgreSQL / JPA
 
-Agrupa utilidades de testing compartidas: Testcontainers, EmbeddedKafka y clase base `BaseIntegrationTest`.
+Proporciona auto-configuración de Spring Data JPA con PostgreSQL. Incluye H2 en scope `test` para pruebas en memoria.
+
+**Dependencia:**
+
+```xml
+<dependency>
+    <groupId>com.github.juanfranciscofernandezherreros</groupId>
+    <artifactId>library-base-starter-db</artifactId>
+</dependency>
+```
+
+**Propiedades configurables** (`application.yml`):
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mydb
+    username: myuser
+    password: secret
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+library:
+  db:
+    default-schema: public   # schema Hibernate por defecto (default: public)
+    ddl-auto: validate       # estrategia DDL (default: validate)
+```
+
+---
+
+#### 3.4 `library-base-starter-openapi` — Generación de código desde spec OpenAPI
+
+Lee un fichero de especificación OpenAPI 3 (YAML o JSON) y genera automáticamente DTOs e interfaces de controlador al arrancar la aplicación. Las fuentes se escriben en `target/generated-sources/openapi` por defecto.
+
+**Dependencia:**
+
+```xml
+<dependency>
+    <groupId>com.github.juanfranciscofernandezherreros</groupId>
+    <artifactId>library-base-starter-openapi</artifactId>
+</dependency>
+```
+
+**Propiedades configurables** (`application.yml`):
+
+```yaml
+library:
+  openapi:
+    spec-path: src/main/resources/openapi.yaml   # ruta al fichero YAML/JSON (obligatorio)
+    output-dir: target/generated-sources/openapi  # directorio de salida (default)
+    base-package: com.example.api                 # paquete raíz del código generado (default: generated.api)
+    enabled: true                                 # activa/desactiva la generación (default: true)
+```
+
+El valor de `spec-path` acepta:
+- Ruta relativa o absoluta al sistema de ficheros: `src/main/resources/openapi.yaml`
+- Recurso del classpath: `classpath:openapi.yaml`
+- URL HTTP/HTTPS: `https://raw.githubusercontent.com/.../openapi.yaml`
+
+**Salida generada** (para `base-package: com.example.api`):
+
+```
+target/generated-sources/openapi/
+  com/example/api/
+    dto/           ← un *Dto.java por cada schema definido en components/schemas
+    controller/    ← un *Controller.java por cada tag (o "Default" si no hay tag)
+```
+
+Consulta el apartado [Guía: usar como parent + OpenAPI YAML](#guía-usar-como-parent--openapi-yaml) para ver un ejemplo completo de integración.
+
+---
+
+#### 3.5 `library-base-starter-test` — Utilidades de testing compartidas
+
+Agrupa utilidades de testing: EmbeddedKafka y clase base `BaseIntegrationTest`.
 
 **Dependencia** (scope `test`):
 
@@ -228,6 +306,174 @@ No es necesario ninguna configuración adicional en los módulos consumidores.
 
 ---
 
+## Guía: usar como parent + OpenAPI YAML
+
+Esta sección describe cómo crear un microservicio que:
+1. use `library-base-parent` como POM padre,
+2. importe el BOM para gestionar versiones,
+3. active el starter OpenAPI para generar código a partir de un fichero YAML.
+
+### Paso 1 — `pom.xml` del microservicio
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- 1) Heredar la configuración de plugins, Lombok/MapStruct y distribución -->
+    <parent>
+        <groupId>com.github.juanfranciscofernandezherreros</groupId>
+        <artifactId>library-base-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>com.example</groupId>
+    <artifactId>mi-microservicio</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+
+    <dependencyManagement>
+        <!-- 2) Importar el BOM para no repetir versiones en cada dependencia -->
+        <dependencies>
+            <dependency>
+                <groupId>com.github.juanfranciscofernandezherreros</groupId>
+                <artifactId>library-base-bom</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!-- Spring Boot Web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- 3) Starter OpenAPI — genera DTOs y controllers desde el YAML -->
+        <dependency>
+            <groupId>com.github.juanfranciscofernandezherreros</groupId>
+            <artifactId>library-base-starter-openapi</artifactId>
+        </dependency>
+    </dependencies>
+</project>
+```
+
+### Paso 2 — Añadir el fichero de especificación
+
+Coloca tu fichero OpenAPI 3 en `src/main/resources/`:
+
+```
+src/main/resources/
+  openapi.yaml
+```
+
+Ejemplo mínimo de `openapi.yaml`:
+
+```yaml
+openapi: "3.0.3"
+info:
+  title: Mi API
+  version: "1.0.0"
+
+paths:
+  /productos:
+    get:
+      tags: [productos]
+      operationId: listarProductos
+      summary: Lista todos los productos
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Producto'
+
+components:
+  schemas:
+    Producto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nombre:
+          type: string
+        precio:
+          type: number
+          format: double
+```
+
+### Paso 3 — Configurar `application.yml`
+
+```yaml
+library:
+  openapi:
+    spec-path: src/main/resources/openapi.yaml
+    output-dir: target/generated-sources/openapi
+    base-package: com.example.miservicio.api
+    enabled: true
+```
+
+### Paso 4 — Compilar
+
+Al ejecutar `mvn spring-boot:run` o `mvn compile`, el `ApplicationRunner` del starter lee el YAML y escribe los ficheros generados bajo `target/generated-sources/openapi/`:
+
+```
+target/generated-sources/openapi/
+  com/example/miservicio/api/
+    dto/
+      ProductoDto.java
+    controller/
+      ProductosController.java
+```
+
+> **Nota:** para que el compilador vea las clases generadas en un `mvn package` normal, añade el directorio de salida como source root con el plugin `build-helper-maven-plugin`:
+>
+> ```xml
+> <plugin>
+>     <groupId>org.codehaus.mojo</groupId>
+>     <artifactId>build-helper-maven-plugin</artifactId>
+>     <executions>
+>         <execution>
+>             <id>add-generated-sources</id>
+>             <phase>generate-sources</phase>
+>             <goals><goal>add-source</goal></goals>
+>             <configuration>
+>                 <sources>
+>                     <source>target/generated-sources/openapi</source>
+>                 </sources>
+>             </configuration>
+>         </execution>
+>     </executions>
+> </plugin>
+> ```
+
+### Resumen del flujo
+
+```
+pom.xml
+  └─ parent: library-base-parent       ← hereda plugins, Java 17, Lombok/MapStruct
+  └─ BOM import: library-base-bom      ← gestiona versiones de todos los starters
+  └─ dep: library-base-starter-openapi ← activa la generación
+
+src/main/resources/openapi.yaml        ← tu especificación OpenAPI 3
+
+application.yml
+  library.openapi.spec-path: ...       ← apunta al YAML
+
+mvn compile / spring-boot:run
+  → ApplicationRunner genera DTOs + Controllers en target/generated-sources/openapi/
+```
+
+---
+
 ## Publicación
 
 ```bash
@@ -265,4 +511,4 @@ Las credenciales se configuran en `~/.m2/settings.xml`:
 mvn clean install
 ```
 
-Construye todos los módulos en el orden correcto: `parent` → `bom` → `starters/base` → `starters/kafka` → `starters-test`.
+Construye todos los módulos en el orden correcto: `parent` → `bom` → `starters/starter-base` → `starters/starter-kafka` → `starters/starter-db` → `starters/starter-openapi` → `starters/starter-test`.
