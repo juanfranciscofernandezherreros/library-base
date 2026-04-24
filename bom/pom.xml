@@ -28,7 +28,7 @@
         <h2.version>2.2.224</h2.version>
 
         <!-- Kafka -->
-        <kafka.version>3.6.2</kafka.version>
+        <kafka.version>3.9.2</kafka.version>
 
         <!-- Avro / AVDL -->
         <avro.version>1.11.4</avro.version>
