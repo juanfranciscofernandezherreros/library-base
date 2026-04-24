@@ -1,0 +1,58 @@
+@options
+@packages
+-classpath
+'/home/runner/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.2.5/spring-boot-autoconfigure-3.2.5.jar:/home/runner/.m2/repository/org/springframework/boot/spring-boot/3.2.5/spring-boot-3.2.5.jar:/home/runner/.m2/repository/org/springframework/spring-context/6.1.6/spring-context-6.1.6.jar:/home/runner/.m2/repository/org/springframework/spring-aop/6.1.6/spring-aop-6.1.6.jar:/home/runner/.m2/repository/org/springframework/spring-beans/6.1.6/spring-beans-6.1.6.jar:/home/runner/.m2/repository/org/springframework/spring-expression/6.1.6/spring-expression-6.1.6.jar:/home/runner/.m2/repository/io/micrometer/micrometer-observation/1.12.5/micrometer-observation-1.12.5.jar:/home/runner/.m2/repository/io/micrometer/micrometer-commons/1.12.5/micrometer-commons-1.12.5.jar:/home/runner/.m2/repository/org/springframework/boot/spring-boot-configuration-processor/3.2.5/spring-boot-configuration-processor-3.2.5.jar:/home/runner/.m2/repository/org/springframework/spring-core/6.1.6/spring-core-6.1.6.jar:/home/runner/.m2/repository/org/springframework/spring-jcl/6.1.6/spring-jcl-6.1.6.jar'
+-encoding
+'UTF-8'
+-protected
+--release
+17
+-sourcepath
+'/home/runner/work/library-base/library-base/starters/starter-base/src/main/java:/home/runner/work/library-base/library-base/starters/starter-base/target/generated-sources/annotations'
+-author
+-bottom
+'Copyright &#169; 2026. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'library-base-starter-base 1.0.0-SNAPSHOT API'
+-use
+-version
+-windowtitle
+'library-base-starter-base 1.0.0-SNAPSHOT API'
+com.github.juanfranciscofernandezherreros.library.base.service
+com.github.juanfranciscofernandezherreros.library.base.autoconfigure
+/home/runner/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.2.5/spring-boot-autoconfigure-3.2.5.jar = 1713463052000
+/home/runner/.m2/repository/org/springframework/boot/spring-boot/3.2.5/spring-boot-3.2.5.jar = 1713463081000
+/home/runner/.m2/repository/org/springframework/spring-context/6.1.6/spring-context-6.1.6.jar = 1712825154000
+/home/runner/.m2/repository/org/springframework/spring-aop/6.1.6/spring-aop-6.1.6.jar = 1712825153000
+/home/runner/.m2/repository/org/springframework/spring-beans/6.1.6/spring-beans-6.1.6.jar = 1712825149000
+/home/runner/.m2/repository/org/springframework/spring-expression/6.1.6/spring-expression-6.1.6.jar = 1712825154000
+/home/runner/.m2/repository/io/micrometer/micrometer-observation/1.12.5/micrometer-observation-1.12.5.jar = 1712584839000
+/home/runner/.m2/repository/io/micrometer/micrometer-commons/1.12.5/micrometer-commons-1.12.5.jar = 1712584828000
+/home/runner/.m2/repository/org/springframework/boot/spring-boot-configuration-processor/3.2.5/spring-boot-configuration-processor-3.2.5.jar = 1713463010000
+/home/runner/.m2/repository/org/springframework/spring-core/6.1.6/spring-core-6.1.6.jar = 1712825153000
+/home/runner/.m2/repository/org/springframework/spring-jcl/6.1.6/spring-jcl-6.1.6.jar = 1712825148000
+/home/runner/work/library-base/library-base/starters/starter-base/src/main/java = 1777023167632
+/home/runner/work/library-base/library-base/starters/starter-base/target/generated-sources/annotations = 1777023649917
+/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs/script.js = 1777023652111
+/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs/allpackages-index.html = 1777023652095
+/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs/element-list = 1777023652039
+/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs/module-search-index.js = 1777023652096
+/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs/index.html = 1777023652084
+/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs/allclasses-index.html = 1777023652094
+/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs/member-search-index.js = 1777023652096
+/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs/package-search-index.js = 1777023652096
+/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs/overview-summary.html = 1777023652106
+/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs/overview-tree.html = 1777023652081
+/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs/help-doc.html = 1777023652109
+/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs/stylesheet.css = 1777023652111
+/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs/tag-search-index.js = 1777023652096
+/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs/index-all.html = 1777023652105
+/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs/jquery-ui.overrides.css = 1777023652114
+/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs/search.js = 1777023652112
+/home/runner/work/library-base/library-base/starters/starter-base/target/apidocs/type-search-index.js = 1777023652096
