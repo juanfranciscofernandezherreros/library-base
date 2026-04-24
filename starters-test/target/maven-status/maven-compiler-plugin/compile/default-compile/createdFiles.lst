@@ -1,0 +1,3 @@
+com/github/juanfranciscofernandezherreros/library/test/support/BaseIntegrationTest.class
+com/github/juanfranciscofernandezherreros/library/test/support/EmbeddedKafkaTestConfig.class
+com/github/juanfranciscofernandezherreros/library/test/autoconfigure/TestAutoConfiguration.class
