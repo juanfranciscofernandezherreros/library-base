@@ -1,0 +1,8 @@
+com/github/juanfranciscofernandezherreros/library/openapi/generator/JavaTypeResolver.class
+com/github/juanfranciscofernandezherreros/library/openapi/autoconfigure/OpenApiProperties.class
+com/github/juanfranciscofernandezherreros/library/openapi/generator/ControllerGenerator$MethodSpec.class
+com/github/juanfranciscofernandezherreros/library/openapi/generator/ControllerGenerator.class
+com/github/juanfranciscofernandezherreros/library/openapi/generator/OpenApiGeneratorService.class
+com/github/juanfranciscofernandezherreros/library/openapi/generator/DtoGenerator.class
+com/github/juanfranciscofernandezherreros/library/openapi/autoconfigure/OpenApiAutoConfiguration.class
+com/github/juanfranciscofernandezherreros/library/openapi/generator/OperationEntry.class

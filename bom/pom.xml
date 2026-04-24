@@ -44,6 +44,9 @@
 
         <!-- Zookeeper (Kafka compatibility) -->
         <zookeeper.version>3.8.6</zookeeper.version>
+
+        <!-- OpenAPI spec parser -->
+        <swagger-parser.version>2.1.22</swagger-parser.version>
     </properties>
 
     <dependencyManagement>
@@ -80,6 +83,12 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.github.juanfranciscofernandezherreros</groupId>
+                <artifactId>library-base-starter-openapi</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- ===== Lombok ===== -->
             <dependency>
                 <groupId>org.projectlombok</groupId>
@@ -98,6 +107,13 @@
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct-processor</artifactId>
                 <version>${mapstruct.version}</version>
+            </dependency>
+
+            <!-- ===== OpenAPI spec parser ===== -->
+            <dependency>
+                <groupId>io.swagger.parser.v3</groupId>
+                <artifactId>swagger-parser</artifactId>
+                <version>${swagger-parser.version}</version>
             </dependency>
 
             <!-- ===== OpenAPI / Springdoc ===== -->
